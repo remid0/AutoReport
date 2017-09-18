@@ -25,7 +25,7 @@ SECRET_KEY = 'isfvm&b5$m)vj&2l!^_k9o&eh56r)y+(jp6b13#*1sqmb4vs%-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -123,3 +123,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Load local settings
+try:
+    # pylint: disable=line-too-long,unused-wildcard-import,wildcard-import,wrong-import-position
+    from server.local_settings import *
+except ImportError:
+    pass

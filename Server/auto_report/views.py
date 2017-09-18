@@ -19,8 +19,7 @@ class UserView(ListAPIView):
         datetime_format = '%Y-%m-%d %H:%M:%S.%f %Z%z'
         queryset = User.objects.all()
         if 'last_update' in self.request.query_params:
-            print(self.request.query_params['last_update'])
-            queryset = queryset.filter(updated_at__gt=datetime.strptime(
+            queryset = queryset.filter(updated_at__gte=datetime.strptime(
                 self.request.query_params['last_update'],
                 datetime_format
             ))
