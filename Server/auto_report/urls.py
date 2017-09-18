@@ -9,7 +9,7 @@ urlpatterns = [  # pylint: disable=invalid-name
         name='create'
     ),
     url(
-        r'^user/$',
+        r'^users/$',
         views.UserView.as_view(),
         name='get'
     ),

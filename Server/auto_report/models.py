@@ -20,19 +20,20 @@ class AutoReportModel(models.Model):
         abstract = True
 
 
+class User(AutoReportModel):
+
+    utc_uid = models.IntegerField()
+    card_hash = models.IntegerField()
+    is_autorized_to_change_mode = models.BooleanField()
+
+
 class GpsTrace(AutoReportModel):
 
     datetime = models.DateTimeField()
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     altitude = models.IntegerField()
-
-
-class User(AutoReportModel):
-
-    utc_uid = models.IntegerField()
-    card_hash = models.IntegerField()
-    is_autorized_delegate_mode = models.BooleanField()
+    session = models.ForeignKey('Session', on_delete=models.CASCADE)
 
 
 class Road(AutoReportModel):
@@ -44,15 +45,16 @@ class Road(AutoReportModel):
 
 class Session(AutoReportModel):
 
+    MANUAL_DRINVING = 'MAN'
+    AUNONOMOUS_DRIVING = 'AUT'
     MODE_CHOICES = (
-        ('MAN', 'manual driving'),
-        ('AUT', 'autonomous driving'),
+        (MANUAL_DRINVING, 'manual driving'),
+        (AUNONOMOUS_DRIVING, 'autonomous driving'),
     )
 
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()
-    mode = models.CharField(max_length=3, choices=MODE_CHOICES),
+    mode = models.CharField(max_length=3, choices=MODE_CHOICES)
     distance = models.IntegerField()
     users = models.ManyToManyField(User)
     roads = models.ManyToManyField(Road)
-    gps_traces = models.ManyToManyField(GpsTrace)

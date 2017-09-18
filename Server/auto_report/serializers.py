@@ -6,8 +6,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('utc_uid', 'card_hash', 'is_autorized_delegate_mode',)
-        read_only_fields = ('updated_at', 'utc_uid', 'card_hash', 'is_autorized_delegate_mode',)
+        fields = ('utc_uid', 'card_hash', 'is_autorized_to_change_mode',)
+        read_only_fields = ('utc_uid', 'card_hash', 'is_autorized_to_change_mode',)
 
 
 class GpsTraceSerializer(serializers.ModelSerializer):
