@@ -33,14 +33,14 @@ class GpsTrace(AutoReportModel):
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
     altitude = models.IntegerField()
-    session = models.ForeignKey('Session', on_delete=models.CASCADE)
+    session = models.ForeignKey('Session', on_delete=models.CASCADE, related_name='gps_traces')
 
 
 class Road(AutoReportModel):
 
     name = models.CharField(max_length=100)
     kind = models.CharField(max_length=20)
-    gps_traces = models.ManyToManyField(GpsTrace)
+    gps_traces = models.ManyToManyField(GpsTrace, related_name='roads')
 
 
 class Session(AutoReportModel):
@@ -56,5 +56,5 @@ class Session(AutoReportModel):
     stop_date = models.DateTimeField()
     mode = models.CharField(max_length=3, choices=MODE_CHOICES)
     distance = models.IntegerField()
-    users = models.ManyToManyField(User)
-    roads = models.ManyToManyField(Road)
+    users = models.ManyToManyField(User, related_name='sessions')
+    roads = models.ManyToManyField(Road, related_name='sessions')

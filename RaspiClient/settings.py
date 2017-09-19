@@ -1,3 +1,4 @@
+GPS_DEVICE = 'ttyUSB0'
 SEVER_ADDRESS = 'http://127.0.0.1:8000/'
 
 # Load local settings
