@@ -22,9 +22,15 @@ class AutoReportModel(models.Model):
 
 class User(AutoReportModel):
 
-    utc_uid = models.IntegerField()
-    card_hash = models.IntegerField()
+    utc_uid = models.IntegerField(unique=True)
+    card_hash = models.IntegerField()  # TODO: Replace by BinaryField for hash
     is_autorized_to_change_mode = models.BooleanField()
+
+    def __repr__(self):
+        return 'user  %d' % (self.utc_uid)
+
+    def __str__(self):
+        return repr(self)
 
 
 class GpsTrace(AutoReportModel):
@@ -58,3 +64,9 @@ class Session(AutoReportModel):
     distance = models.IntegerField()
     users = models.ManyToManyField(User, related_name='sessions')
     roads = models.ManyToManyField(Road, related_name='sessions')
+
+    def __repr__(self):
+        return 'Session'
+
+    def __str__(self):
+        return repr(self)

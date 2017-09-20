@@ -4,8 +4,8 @@ from auto_report import views
 
 urlpatterns = [  # pylint: disable=invalid-name
     url(
-        r'^gps_trace/create/$',
-        views.CreateGpsTraceView.as_view(),
+        r'^sessions/create/$',
+        views.CreateSessionsView.as_view(),
         name='create'
     ),
     url(
