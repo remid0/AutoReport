@@ -1,10 +1,13 @@
+from django.core.validators import MinLengthValidator
 from django.db import models
 from django.utils import timezone
+
+import ldap
 
 
 class AutoReportModel(models.Model):
     created_at = models.DateTimeField(editable=False)
-    updated_at = models.DateTimeField()
+    updated_at = models.DateTimeField(blank=True)
 
     def save(self, *args, **kwargs):
         self._prepopulate_fields()
@@ -22,12 +25,41 @@ class AutoReportModel(models.Model):
 
 class User(AutoReportModel):
 
-    utc_uid = models.IntegerField(unique=True)
-    card_hash = models.IntegerField()  # TODO: Replace by BinaryField for hash
+    utc_uid = models.CharField(unique=True, max_length=8, validators=[MinLengthValidator(8)])
+    card_hash = models.BinaryField()
     is_autorized_to_change_mode = models.BooleanField()
 
+    is_ldap_completed = models.BooleanField(default=False, blank=True)
+    first_name = models.CharField(max_length=25, blank=True)
+    last_name = models.CharField(max_length=25, blank=True)
+    email = models.EmailField(blank=True)
+    role = models.CharField(max_length=20, blank=True)
+
+    def _prepopulate_fields(self):
+        if not self.is_ldap_completed:
+            connection = ldap.initialize('ldap://ldap.utc.fr:389')
+            connection.set_option(ldap.OPT_NETWORK_TIMEOUT, 10.0)
+            try:
+                result = connection.search_s(
+                    'ou=people,dc=utc,dc=fr',
+                    ldap.SCOPE_ONELEVEL, "(uid=%s)" % self.utc_uid
+                )
+                self.first_name = result[0][1]['givenName'][0].decode('unicode_escape')
+                self.last_name = result[0][1]['sn'][0].decode('unicode_escape')
+                self.email = result[0][1]['mail'][0].decode('unicode_escape')
+                self.role = result[0][1]['ou'][0].decode('unicode_escape')
+                self.is_ldap_completed = True
+            except ldap.LDAPError:
+                pass
+
+        super(User, self)._prepopulate_fields()
+
     def __repr__(self):
-        return 'user  %d' % (self.utc_uid)
+
+        if self.is_ldap_completed:
+            return 'User : %s %s' % (self.last_name, self.first_name)
+        else:
+            return 'User : %s' % self.utc_uid
 
     def __str__(self):
         return repr(self)
