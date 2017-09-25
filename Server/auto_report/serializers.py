@@ -1,8 +1,8 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 from auto_report.models import User, GpsTrace, Session
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
@@ -10,14 +10,14 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('card_hash', 'id', 'is_autorized_to_change_mode')
 
 
-class GpsTraceSerializer(serializers.ModelSerializer):
+class GpsTraceSerializer(ModelSerializer):
 
     class Meta:
         model = GpsTrace
         fields = ('datetime', 'latitude', 'longitude', 'altitude')
 
 
-class SessionSerializer(serializers.ModelSerializer):
+class SessionSerializer(ModelSerializer):
 
     gps_traces = GpsTraceSerializer(many=True)
 
