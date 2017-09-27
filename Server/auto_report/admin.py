@@ -8,7 +8,9 @@ class GpsTraceAdmin(admin.ModelAdmin):
 
 
 class UserAdmin(admin.ModelAdmin):
-    pass
+
+    search_fields = ['first_name', 'last_name', 'utc_uid']
+    readonly_fields = ('updated_at',)
 
 
 class RoadAdmin(admin.ModelAdmin):
@@ -16,7 +18,8 @@ class RoadAdmin(admin.ModelAdmin):
 
 
 class SessionAdmin(admin.ModelAdmin):
-    pass
+
+    raw_id_fields = ['roads', 'users']
 
 
 admin.site.register(GpsTrace, GpsTraceAdmin)
