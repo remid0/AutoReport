@@ -26,7 +26,7 @@ class AutoReportModel(models.Model):
 class User(AutoReportModel):
 
     utc_uid = models.CharField(unique=True, max_length=8, validators=[MinLengthValidator(8)])
-    card_hash = models.BinaryField()
+    card_hash = models.CharField(max_length=64)
     is_autorized_to_change_mode = models.BooleanField()
 
     is_ldap_completed = models.BooleanField(default=False, blank=True)
@@ -65,40 +65,72 @@ class User(AutoReportModel):
         return repr(self)
 
 
-class GpsTrace(AutoReportModel):
+class Car(AutoReportModel):
+
+    name = models.CharField(unique=True, max_length=20)
+    vin_code = models.CharField(max_length=17, validators=[MinLengthValidator(8)])
+
+    def __repr__(self):
+        return self.name
+
+    def __str__(self):
+        return repr(self)
+
+
+class GpsPoint(AutoReportModel):
 
     datetime = models.DateTimeField()
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
     longitude = models.DecimalField(max_digits=9, decimal_places=6)
-    altitude = models.IntegerField()
-    session = models.ForeignKey('Session', on_delete=models.CASCADE, related_name='gps_traces')
+    altitude = models.DecimalField(max_digits=7, decimal_places=3)
+    speed = models.DecimalField(max_digits=5, decimal_places=3)
+    track = models.DecimalField(max_digits=7, decimal_places=4)
+    session = models.ForeignKey('Session', on_delete=models.CASCADE, related_name='gps_points')
+    road = models.ForeignKey('Road', related_name='gps_points', blank=True, null=True)
+
+    def __repr__(self):
+        if self.road:
+            return 'GpsPoint on %s' % self.road
+        else:
+            return 'GpsPoint: %s %s' % (str(self.latitude), str(self.longitude))
+
+    def __str__(self):
+        return repr(self)
 
 
 class Road(AutoReportModel):
 
     name = models.CharField(max_length=100)
     kind = models.CharField(max_length=20)
-    gps_traces = models.ManyToManyField(GpsTrace, related_name='roads')
+
+    def __repr__(self):
+        return 'Road: %s' % self.name
+
+    def __str__(self):
+        return repr(self)
 
 
 class Session(AutoReportModel):
 
     MANUAL_DRINVING = 'MAN'
+    COOPERATIVE_DRIVING = 'COP'
     AUNONOMOUS_DRIVING = 'AUT'
     MODE_CHOICES = (
-        (MANUAL_DRINVING, 'manual driving'),
-        (AUNONOMOUS_DRIVING, 'autonomous driving'),
+        (MANUAL_DRINVING, 'Manual driving'),
+        (COOPERATIVE_DRIVING, 'Cooperative driving'),
+        (AUNONOMOUS_DRIVING, 'Autonomous driving'),
     )
 
     start_date = models.DateTimeField()
     stop_date = models.DateTimeField()
     mode = models.CharField(max_length=3, choices=MODE_CHOICES)
     distance = models.IntegerField()
+
+    car = models.ForeignKey('Car', on_delete=models.CASCADE, related_name='sessions')
     users = models.ManyToManyField(User, related_name='sessions')
-    roads = models.ManyToManyField(Road, related_name='sessions')
 
     def __repr__(self):
-        return 'Session'
+        return 'Session: %s' % self.start_date.strftime('%Y-%m-%d %H:%M:%S')
 
     def __str__(self):
         return repr(self)

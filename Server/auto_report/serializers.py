@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from auto_report.models import User, GpsTrace, Session
+from auto_report.models import User, GpsPoint, Session
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,16 +10,16 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = ('card_hash', 'id', 'is_autorized_to_change_mode')
 
 
-class GpsTraceSerializer(serializers.ModelSerializer):
+class GpsPointSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = GpsTrace
+        model = GpsPoint
         fields = ('datetime', 'latitude', 'longitude', 'altitude')
 
 
 class SessionSerializer(serializers.ModelSerializer):
 
-    gps_traces = GpsTraceSerializer(many=True)
+    gps_traces = GpsPointSerializer(many=True)
 
     class Meta:
         model = Session
@@ -30,7 +30,7 @@ class SessionSerializer(serializers.ModelSerializer):
         users = validated_data.pop('users')
         session = Session.objects.create(**validated_data)
         for gps_trace in gps_traces:
-            GpsTrace.objects.create(session=session, **gps_trace)
+            GpsPoint.objects.create(session=session, **gps_trace)
         session.users.add(*users)
         self.create_roads(session)
         return session
