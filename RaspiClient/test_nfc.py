@@ -1,5 +1,7 @@
 from smartcard.CardMonitoring import CardMonitor, CardObserver
-# from smartcard.util import toHexString, toBytes
+from smartcard.util import toHexString
+
+import db_manager
 
 
 GET_UID = [0xFF, 0xCA, 0x00, 0x00, 0x00]
@@ -19,8 +21,8 @@ class MyObserver(CardObserver):
             card.connection = card.createConnection()
             card.connection.connect()
             response, sw1, sw2 = card.connection.transmit(GET_UID)
-            print(response)
-            if True:
+            print(response)  # DEBUG
+            if db_manager.is_autorized(toHexString(response).replace(' ', '')):
                 card.connection.transmit(SUCCESS)
             else:
                 card.connection.transmit(FAIL)
@@ -33,4 +35,4 @@ cardmonitor = CardMonitor()
 cardobserver = MyObserver()
 cardmonitor.addObserver(cardobserver)
 
-# cardmonitor.instance.deleteObservers()   
+# TODO: cardmonitor.instance.deleteObservers()

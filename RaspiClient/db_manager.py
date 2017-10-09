@@ -22,25 +22,6 @@ def ini_local_db():
         CONNECTION.commit()
 
 
-def insert_new_user(new_user):
-    CURSOR.execute("INSERT INTO Users VALUES (%d, '%s', %d)" % (
-        new_user['id'],
-        new_user['card_hash'],
-        1 if new_user['is_autorized_to_change_mode'] else 0
-    ))
-
-
-def update_user(user):
-    CURSOR.execute('''UPDATE Users
-        SET card_hash = '%s', is_autorized_to_change_mode = %d
-        WHERE server_pk = %d''' % (
-            user['card_hash'],
-            1 if user['is_autorized_to_change_mode'] else 0,
-            user['id'],
-        )
-    )
-
-
 def update_local_db():
     now = datetime.utcnow()
     CURSOR.execute("SELECT updated_at from LastUpdate")
@@ -58,9 +39,23 @@ def update_local_db():
     for user in results.json():
         CURSOR.execute("SELECT * from Users WHERE server_pk = %d" % user['id'])
         if CURSOR.fetchone():
-            update_user(user)
+            CURSOR.execute(
+                '''
+                UPDATE Users
+                SET card_hash = '%s', is_autorized_to_change_mode = %d
+                WHERE server_pk = %d
+                ''' % (
+                    user['card_hash'],
+                    1 if user['is_autorized_to_change_mode'] else 0,
+                    user['id']
+                )
+            )
         else:
-            insert_new_user(user)
+            CURSOR.execute("INSERT INTO Users VALUES (%d, '%s', %d)" % (
+                user['id'],
+                user['card_hash'],
+                1 if user['is_autorized_to_change_mode'] else 0
+            ))
     if last_update:
         CURSOR.execute(
             "UPDATE LastUpdate SET updated_at = '%s'" % now.strftime(settings.DATETIME_FORMAT)
@@ -70,3 +65,13 @@ def update_local_db():
             "INSERT INTO LastUpdate VALUES ('%s')" % now.strftime(settings.DATETIME_FORMAT)
         )
     CONNECTION.commit()
+
+
+def is_autorized(card_hash):
+    CURSOR.execute(
+        "SELECT is_autorized_to_change_mode from Users WHERE card_hash = '%s'" % card_hash
+    )
+    results = CURSOR.fetchone()
+    if results[0] == 1:
+        return True
+    return False
