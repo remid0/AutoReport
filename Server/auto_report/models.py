@@ -112,13 +112,13 @@ class Road(AutoReportModel):
 
 class Session(AutoReportModel):
 
-    MANUAL_DRINVING = 'MAN'
+    MANUAL_DRIVING = 'MAN'
     COOPERATIVE_DRIVING = 'COP'
-    AUNONOMOUS_DRIVING = 'AUT'
+    AUTONOMOUS_DRIVING = 'AUT'
     MODE_CHOICES = (
-        (MANUAL_DRINVING, 'Manual driving'),
+        (MANUAL_DRIVING, 'Manual driving'),
         (COOPERATIVE_DRIVING, 'Cooperative driving'),
-        (AUNONOMOUS_DRIVING, 'Autonomous driving'),
+        (AUTONOMOUS_DRIVING, 'Autonomous driving'),
     )
 
     start_date = models.DateTimeField()

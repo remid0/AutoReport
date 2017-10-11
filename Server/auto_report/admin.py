@@ -8,7 +8,7 @@ class CarAdmin(admin.ModelAdmin):
 
 
 class GpsPointAdmin(admin.ModelAdmin):
-    raw_id_fields = ['session']
+    raw_id_fields = ['session', 'road']
     readonly_fields = ('updated_at',)
 
 

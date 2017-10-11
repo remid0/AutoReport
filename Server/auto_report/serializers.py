@@ -19,18 +19,18 @@ class GpsPointSerializer(serializers.ModelSerializer):
 
 class SessionSerializer(serializers.ModelSerializer):
 
-    gps_traces = GpsPointSerializer(many=True)
+    gps_points = GpsPointSerializer(many=True)
 
     class Meta:
         model = Session
-        fields = ('distance', 'gps_traces', 'mode', 'start_date', 'stop_date', 'users')
+        fields = ('distance', 'gps_points', 'mode', 'start_date', 'stop_date', 'users')
 
     def create(self, validated_data):
-        gps_traces = validated_data.pop('gps_traces')
+        gps_points = validated_data.pop('gps_points')
         users = validated_data.pop('users')
         session = Session.objects.create(**validated_data)
-        for gps_trace in gps_traces:
-            GpsPoint.objects.create(session=session, **gps_trace)
+        for gps_point in gps_points:
+            GpsPoint.objects.create(session=session, **gps_point)
         session.users.add(*users)
         self.create_roads(session)
         return session
