@@ -2,6 +2,8 @@ from datetime import datetime
 
 from django.utils import timezone
 from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework import status
+from rest_framework.response import Response
 
 from auto_report.models import User
 from auto_report.serializers import UserSerializer, SessionSerializer
@@ -24,4 +26,13 @@ class UserView(ListAPIView):
 
 class CreateSessionsView(CreateAPIView):
 
-    serializer_class = SessionSerializer()
+    serializer_class = SessionSerializer
+
+    def create(self, request, *args, **kwargs):
+        import ipdb
+        ipdb.set_trace()
+        serializer = self.get_serializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

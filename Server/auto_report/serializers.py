@@ -2,7 +2,7 @@ from rest_framework import serializers
 from auto_report.models import User, GpsPoint, Session
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
@@ -17,7 +17,7 @@ class GpsPointSerializer(serializers.ModelSerializer):
         fields = ('datetime', 'latitude', 'longitude', 'altitude')
 
 
-class SessionSerializer(serializers.ModelSerializer):
+class SessionSerializer(ModelSerializer):
 
     gps_points = GpsPointSerializer(many=True)
 
