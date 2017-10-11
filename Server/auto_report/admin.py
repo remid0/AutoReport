@@ -1,10 +1,25 @@
 from django.contrib import admin
 
-from auto_report.models import GpsTrace, User, Road, Session
+from auto_report.models import Car, GpsPoint, Road, Session, User
 
 
-class GpsTraceAdmin(admin.ModelAdmin):
-    pass
+class CarAdmin(admin.ModelAdmin):
+    readonly_fields = ('updated_at',)
+
+
+class GpsPointAdmin(admin.ModelAdmin):
+    raw_id_fields = ['session', 'road']
+    readonly_fields = ('updated_at',)
+
+
+class RoadAdmin(admin.ModelAdmin):
+    readonly_fields = ('updated_at',)
+
+
+class SessionAdmin(admin.ModelAdmin):
+
+    raw_id_fields = ['users']
+    readonly_fields = ('updated_at',)
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -13,16 +28,8 @@ class UserAdmin(admin.ModelAdmin):
     readonly_fields = ('updated_at',)
 
 
-class RoadAdmin(admin.ModelAdmin):
-    pass
-
-
-class SessionAdmin(admin.ModelAdmin):
-
-    raw_id_fields = ['roads', 'users']
-
-
-admin.site.register(GpsTrace, GpsTraceAdmin)
-admin.site.register(User, UserAdmin)
+admin.site.register(Car, CarAdmin)
+admin.site.register(GpsPoint, GpsPointAdmin)
 admin.site.register(Road, RoadAdmin)
 admin.site.register(Session, SessionAdmin)
+admin.site.register(User, UserAdmin)
