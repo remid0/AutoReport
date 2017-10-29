@@ -1,49 +1,44 @@
+from can_manager import CanManager
 from db_manager import DBManager
 from gps_manager import GpsManager
 from nfc_manager import NFCManager
+from models import Session
 
 
-# Local Database initialisation
-db_manager = DBManager()
-db_manager.init_local_db()
-# if network
-db_manager.update_local_db()
+class MainController():
 
-# gps initialisation
-gps_manager = GpsManager()
+    def __init__(self):
+        # TODO: define a share object current session that could be updated by NFC & CAN manager
+        pass
 
-# NFC reader initialisation
-nfc_manager = NFCManager()
+    def run(self):
+        db_manager = DBManager()
+        db_manager.init_local_db()
+        try:
+            db_manager.update_local_db()
+        except ValueError:  # Network Error
+            pass
+        gps_manager = GpsManager()
+        nfc_manager = NFCManager()
+        can_manager = CanManager()
 
-# Can reader initialisation
-##
+        # This initialisation can be done in the can Manager (with current user to none)
+        current_session = Session(
+            user=nfc_manager.get_current_user_id(),
+            mode=can_manager.get_current_mode(),
+            odometer_value=can_manager.get_odometer_value()
+        )
+        # CanManager create new session when change mode is detected
+        # NFCManager create new session when;
+        #    - user log out
+        #    - new user log in
+        # When can manager detect SIGKILL, it trigger stop procedure
 
-# TODO: Algo
+        # stop procedure
+        # - kill other process if needed
+        # - when killing gps-manger: store last gps point in the local db
+        # - read sessions file and upload data if it's possible
 
-# Global Shared var
-#    current_session
 
-# last_gps_point = db_manager.last_gps_point()
-# current_session = Session()
-# current_session.start()
-# current_session.gps_points.add(last_gps_point)
-
-#    NFController behaviour when detect NFC_card
-#        if no user in current_session
-#            current_session.user = new_user(NFC_card)
-#        else if session is MANUAL
-#            current_session.close()
-#            db_manager.save_session(current_session)
-#            current_session = Session()
-#            current_session.user = new_user(NFC_card)
-#            current_session.start()
-
-# while True:
-#    if SIGKILL:  # get SIGKILL from can_manager
-#        break
-#    # Lot of stuff here
-
-# Kill all process
-# store last gps point in the local db
-# if network: #  Consider use network manager in a sub process
-#    db_manager.update_remote_db()
+if __name__ == '__main__':
+    MainController().run()

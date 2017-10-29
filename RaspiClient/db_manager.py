@@ -3,13 +3,14 @@ import sqlite3
 
 import requests
 
+from models import User
 import settings
 
 
 class DBManager(object):
 
     def __init__(self):
-        self.connection = sqlite3.connect('users_db.sqlite3', check_same_thread=False)
+        self.connection = sqlite3.connect(settings.LOCAL_DB_NAME, check_same_thread=False)
         self.cursor = self.connection.cursor()
 
     def ini_local_db(self):
@@ -21,6 +22,7 @@ class DBManager(object):
                 is_autorized_to_change_mode int
             )''')
             self.cursor.execute("CREATE TABLE LastUpdate (updated_at text)")
+            # self.cursor.execute("CREATE TABLE LastGpsPoint (updated_at text)")
             self.connection.commit()
 
     def update_local_db(self):
@@ -67,11 +69,22 @@ class DBManager(object):
             )
         self.connection.commit()
 
-    def is_autorized(self, card_hash):
-        self.cursor.execute(
-            "SELECT is_autorized_to_change_mode from Users WHERE card_hash = '%s'" % card_hash
-        )
+    def get_user(self, card_uid):
+        card_hash = card_uid  # TODO : calculate card_hash
+        self.cursor.execute('''
+            SELECT server_pk, is_autorized_to_change_mode from Users
+            WHERE card_hash = '%s
+        ''' % card_hash)
         result = self.cursor.fetchone()
-        if result and result[0] == 1:
-            return True
-        return False
+        if result:
+            return User(
+                server_pk=result[0],
+                card_hash=result[1],
+                is_autorized_to_change_mode=result[2]
+            )
+
+    def store_last_gps_point(self, gps_point):
+        pass
+
+    def get_last_gps_point(self):
+        pass

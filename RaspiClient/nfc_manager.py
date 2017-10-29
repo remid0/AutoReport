@@ -1,4 +1,4 @@
-from ctypes import c_bool
+from ctypes import c_int
 from multiprocessing.sharedctypes import Value
 
 from smartcard.CardMonitoring import CardMonitor, CardObserver
@@ -14,11 +14,13 @@ LOGOUT = [0xFF, 0x00, 0x40, 0x8D, 0x04, 0x01, 0x03, 0x01, 0x03]
 
 class MyObserver(CardObserver):
 
-    def __init__(self, is_autorized):
-        self.is_autorized = is_autorized
-        self.cards = []
-        self.db_controllerh = DBManager()
-        self.is_current_user = ''
+    current_user = None
+    cards = []
+
+    def __init__(self, current_user_id):
+        self.db_manager = DBManager()
+        self.current_user_id = current_user_id
+        self.reset_current_user()
 
     def update(self, observable, actions):
         (addedcards, removedcards) = actions
@@ -28,30 +30,39 @@ class MyObserver(CardObserver):
             card.connection.connect()
             response, sw1, sw2 = card.connection.transmit(GET_UID)
             card_uid = toHexString(response).replace(' ', '')
-            if self.is_current_user == card_uid:  # self.db_controller.is_current_user(card_uid):
-                self.is_autorized.value = False
+            user = self.db_manager.get_user(card_uid)
+            if self.current_user and self.current_user.server_pk == user.server_pk:
+                # Authorization = False
                 card.connection.transmit(LOGOUT)
-                self.is_current_user = ''
+                self.reset_current_user()
             else:
-                self.is_current_user = card_uid
-                if self.db_controller.is_autorized(card_uid):
-                    self.is_autorized.value = True
+                self.current_user = user
+                self.current_user_id.value = self.current_user.server_pk
+                if self.current_user.is_autorized_to_change_mode:
+                    # Authorization = True
                     card.connection.transmit(AUTHORIZED)
                 else:
-                    self.is_autorized.value = False
+                    # Authorization = False
                     card.connection.transmit(UNAUTHORIZED)
 
         for card in removedcards:
             if card in self.cards:
                 self.cards.remove(card)
 
+    def reset_current_user(self):
+        self.current_user = None
+        self.current_user_id.value = -1
+
 
 class NFCManager(object):
 
     def __init__(self):
-        self.is_autorized = Value(c_bool)
+        self.current_user_id = Value(c_int)
         cardmonitor = CardMonitor()
-        cardobserver = MyObserver(self.is_autorized)
+        cardobserver = MyObserver(self.current_user_id)
         cardmonitor.addObserver(cardobserver)
 
-# TODO: cardmonitor.instance.deleteObservers()
+    def get_current_user_id(self):
+        return self.current_user_id.value if self.current_user_id.value != -1 else None
+
+# cardmonitor.instance.deleteObservers()
