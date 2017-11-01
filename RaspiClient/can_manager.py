@@ -5,10 +5,12 @@ from multiprocessing.sharedctypes import Value
 
 import can
 
+
 class CanReceiver(object):
+
     @classmethod
     def receive(cls, odometer_value, odometer_time, vin, vehicule_state, vehicule_bus):
-        while(True):
+        while True:
             message = vehicule_bus.recv()
 
             if message.arbitration_id == 0x5D7:
@@ -23,7 +25,7 @@ class CanReceiver(object):
 
     @classmethod
     def decode_odometer_value(cls, data):
-        mask =  0xFFFFF000
+        mask = 0xFFFFF000
         return (int.from_bytes(data, byteorder='big') & mask) >> 12
 
     @classmethod
