@@ -13,7 +13,7 @@ class DBManager(object):
         self.connection = sqlite3.connect(settings.LOCAL_DB_NAME, check_same_thread=False)
         self.cursor = self.connection.cursor()
 
-    def ini_local_db(self):
+    def init_local_db(self):
         self.cursor.execute("SELECT * FROM sqlite_master WHERE name ='Users' and type='table'")
         if not self.cursor.fetchone():
             self.cursor.execute('''CREATE TABLE Users (

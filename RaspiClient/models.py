@@ -2,6 +2,10 @@ from datetime import datetime
 import pickle
 
 
+class AutoReportException(Exception):
+    pass
+
+
 class GpsPoint(object):
 
     def __init__(self, **kwargs):
@@ -14,13 +18,13 @@ class GpsPoint(object):
 
 
 class Session(object):
-    end_datetime = None
-    distance = None
 
-    def __init__(self, user, mode, odometer_value):
+    def __init__(self, mode, odometer_value, **kwargs):
+        self.end_datetime = None
+        self.distance = None
         self.start_datetime = datetime.utcnow()
         self.mode = mode
-        self.user = user
+        self.user = kwargs.get('user', None)
         self.gps_points = []
 
         self._initial_odometer_value = odometer_value
@@ -28,6 +32,7 @@ class Session(object):
     def stop(self, odometer_value):
         self.end_datetime = datetime.utcnow()
         self.distance = odometer_value - self._initial_odometer_value
+        del self._initial_odometer_value
 
     def save(self, filename):
         with open(filename, 'ab+') as myfile:
@@ -48,6 +53,6 @@ class Session(object):
 class User(object):
 
     def __init__(self, **kwargs):
-        server_pk = kwargs.get('server_pk', None)
-        card_hash = kwargs.get('card_hash', None)
-        is_autorized_to_change_mode = kwargs.get('is_autorized_to_change_mode', None)
+        self.server_pk = kwargs.get('server_pk', None)
+        self.card_hash = kwargs.get('card_hash', None)
+        self.is_autorized_to_change_mode = kwargs.get('is_autorized_to_change_mode', None)

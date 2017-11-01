@@ -14,6 +14,11 @@ class MODE(Enum):
     AUTONOMOUS_DRIVING = 'AUT'
 
 
+class STATUS_CODE(Enum):
+    LOGIN = 1
+    LOGOUT = 2
+
+
 # Load local settings
 try:
     # pylint: disable=line-too-long,unused-wildcard-import,wildcard-import,wrong-import-position
