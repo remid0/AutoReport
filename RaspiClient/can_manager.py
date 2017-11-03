@@ -24,12 +24,12 @@ class MABXCanReceiver(object):
         return (int.from_bytes(data, byteorder='big') & mask) >> 24
 
 
-class VehiculeCanReceiver(object):
+class VehicleCanReceiver(object):
 
     @classmethod
-    def receive(cls, odometer_value, odometer_time, vin, vehicule_state, vehicule_bus):
+    def receive(cls, odometer_value, odometer_time, vin, vehicle_state, vehicle_bus):
         while True:
-            message = vehicule_bus.recv()
+            message = vehicle_bus.recv()
 
             if message.arbitration_id == 0x5D7:
                 odometer_value.value = cls.decode_odometer_value(message.data)
@@ -39,7 +39,7 @@ class VehiculeCanReceiver(object):
                 vin.value = cls.decode_vin_value(message.data)
 
             elif message.arbitration_id == 0x35C:
-                vehicule_state.value = cls.decode_vehicule_state_value(message.data)
+                vehicle_state.value = cls.decode_vehicle_state_value(message.data)
 
     @classmethod
     def decode_odometer_value(cls, data):
@@ -51,7 +51,7 @@ class VehiculeCanReceiver(object):
         pass
 
     @classmethod
-    def decode_vehicule_state_value(cls, data):
+    def decode_vehicle_state_value(cls, data):
         mask = 0x700000000000000
         return (int.from_bytes(data, byteorder='big') & mask) >> 56
 
@@ -67,28 +67,28 @@ class CanManager(object):
         self.odometer_value = Value(c_uint)
         self.odometer_time = Value(c_float)
         self.vin = Value(c_uint)
-        self.vehicule_state = Value(c_uint)
+        self.vehicle_state = Value(c_uint)
         self.mode = Value(c_uint)
 
         mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
-        vehicule_bus = Bus(channel=settings.CAN_VEHICULE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
+        vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
         mabx_process = Process(target=MABXCanReceiver.receive, args=(self.mode, mabx_bus))
         mabx_process.start()
-        vehicule_process = Process(target=VehiculeCanReceiver.receive, args=(
-            self.odometer_value, self.odometer_time, self.vin, self.vehicule_state, vehicule_bus
+        vehicle_process = Process(target=VehicleCanReceiver.receive, args=(
+            self.odometer_value, self.odometer_time, self.vin, self.vehicle_state, vehicle_bus
         ))
-        vehicule_process.start()
+        vehicle_process.start()
 
     def get_odometer_info(self):
         return OdometerInfo(self.odometer_value.value, self.odometer_time.value)
 
-    def get_vehicule_state(self):
+    def get_vehicle_state(self):
         pass
         # Possible states :
-            # 0 : vehicule asleep & engine stopped
-            # 1 : vehicule awake & engine stopped
+            # 0 : vehicle asleep & engine stopped
+            # 1 : vehicle awake & engine stopped
             # 2 : ignition ON
             # 3 : starting in progress
-            # 4 : vehicule awake & engine running
+            # 4 : vehicle awake & engine running
 
