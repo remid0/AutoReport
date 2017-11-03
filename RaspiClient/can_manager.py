@@ -44,7 +44,7 @@ class VehicleCanReceiver(object):
     @classmethod
     def decode_odometer_value(cls, data):
         mask = 0xFFFFF000
-        return (int.from_bytes(data, byteorder='big') & mask) >> 12
+        return ((int.from_bytes(data, byteorder='big') & mask) >> 12) * 0.01
 
     @classmethod
     def decode_vin_value(cls, data):
@@ -64,7 +64,8 @@ class OdometerInfo(object):
 
 class CanManager(object):
     def __init__(self):
-        self.odometer_value = Value(c_uint)
+        #TODO : adapt to the SessionManager code
+        self.odometer_value = Value(c_float)
         self.odometer_time = Value(c_float)
         self.vin = Value(c_uint)
         self.vehicle_state = Value(c_uint)
@@ -91,4 +92,3 @@ class CanManager(object):
             # 2 : ignition ON
             # 3 : starting in progress
             # 4 : vehicle awake & engine running
-
