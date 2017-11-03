@@ -2,20 +2,19 @@ import os
 
 from gps3.agps3threaded import AGPS3mechanism
 
-from db_manager import DBManager
 from models import GpsPoint, AutoReportException
 import settings
 
 
 class GpsManager(object):
 
-    def __init__(self):
+    def __init__(self, db_manager):
         os.system('sudo gpsd %s' % settings.GPS_DEVICE)
         self.agps_thread = AGPS3mechanism()
         self.agps_thread.stream_data()
         self.agps_thread.run_thread()
 
-        self.db_manager = DBManager()
+        self.db_manager = db_manager
         self.last_gps_point = self.db_manager.get_last_gps_point()
 
     def get_gps_point(self):
