@@ -15,14 +15,14 @@ ERROR = UNAUTHORIZED
 
 class MyObserver(CardObserver):
 
-    def __init__(self, session_manager):
-        self.db_manager = DBManager()
+    def __init__(self, session_manager, db_manager):
+        self.db_manager = db_manager
         self.cards = []
         self.session_manager = session_manager
 
     def update(self, observable, actions):
-        (addedcards, removedcards) = actions
-        for card in addedcards:
+        (added_cards, removed_cards) = actions
+        for card in added_cards:
             self.cards += [card]
             card.connection = card.createConnection()
             card.connection.connect()
@@ -48,17 +48,17 @@ class MyObserver(CardObserver):
                 # Authorization = False
                 card.connection.transmit(LOGOUT)
 
-        for card in removedcards:
+        for card in removed_cards:
             if card in self.cards:
                 self.cards.remove(card)
 
 
 class NFCManager(object):
 
-    def __init__(self, session_manager):
-        self.cardmonitor = CardMonitor()
-        cardobserver = MyObserver(session_manager)
-        self.cardmonitor.addObserver(cardobserver)
+    def __init__(self, session_manager, db_manager):
+        self.card_monitor = CardMonitor()
+        card_observer = MyObserver(session_manager, db_manager)
+        self.card_monitor.addObserver(card_observer)
 
     def __del__(self):
-        self.cardmonitor.instance.deleteObservers()
+        self.card_monitor.instance.deleteObservers()

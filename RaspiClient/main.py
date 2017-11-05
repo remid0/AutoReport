@@ -1,9 +1,8 @@
 from ctypes import c_int
-from multiprocessing.managers import BaseManager
-from multiprocessing import Value
+from multiprocessing.managers import SyncManager
 
 from can_manager import CanManager
-from gps_manager import GpsManager
+from db_manager import DBManager
 from models import AutoReportException
 from nfc_manager import NFCManager
 from session_manager import SessionManager
@@ -16,19 +15,23 @@ class Main():
 
     def run(self):
 
-        BaseManager.register('SessionManager', SessionManager)
-        manager = BaseManager()
+        SyncManager.register('SessionManager', SessionManager)
+        SyncManager.register('DBManager', DBManager)
+        manager = SyncManager()
         manager.start()
-        odometer_value = Value(c_int)
-        session_manager = manager.SessionManager(odometer_value)
+
+        db_manager = manager.DBManager()
+        odometer_value = manager.Value(c_int, 0)
+        session_manager = manager.SessionManager(db_manager, odometer_value)
 
         try:
-            session_manager.get_db_manager.update_local_db()
+            pass
+            #db_manager.update_local_db()
         except AutoReportException:  # Network Error
             pass
 
         can_manager = CanManager(session_manager, odometer_value)
-        nfc_manager = NFCManager(session_manager)
+        nfc_manager = NFCManager(session_manager, db_manager)
 
         # join the can manager sub process and wait it to exit()
 

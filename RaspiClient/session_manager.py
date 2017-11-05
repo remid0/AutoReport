@@ -1,19 +1,16 @@
 from threading import RLock
 
-from db_manager import DBManager
 from gps_manager import GpsManager
 from models import AutoReportException, Session
-import settings
-from settings import MODE, STATUS_CODE
+from settings import MODE, SESSION_SAVE_FILE, STATUS_CODE
 
 
 class SessionManager():
 
-    def __init__(self, odometer_value):
+    def __init__(self, db_manager, odometer_value):
         self.odometer_value = odometer_value
         self.current_session = None
-        self.db_manager = DBManager()
-        self.gps_manager = GpsManager(self.db_manager)
+        self.gps_manager = GpsManager(db_manager)
         self.session_lock = RLock()
 
     def __del__(self):
@@ -27,7 +24,7 @@ class SessionManager():
     def end_current_session(self):
         with self.session_lock:
             self.current_session.stop(self.odometer_value.value)
-            self.current_session.save(settings.SESSION_SAVE_FILE)
+            self.current_session.save(SESSION_SAVE_FILE)
 
     def add_gps_point(self, gps_point):
         with self.session_lock:
@@ -48,9 +45,6 @@ class SessionManager():
                 return STATUS_CODE.LOGOUT
             self.start_session(self.current_session.mode, user=new_user)
             return STATUS_CODE.LOGIN
-
-    def get_db_manager(self):
-        return self.db_manager
 
     def add_gpt_point(self):
         with self.session_lock:
