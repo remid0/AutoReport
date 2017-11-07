@@ -19,6 +19,7 @@ class MyObserver(CardObserver):
         self.db_manager = db_manager
         self.cards = []
         self.session_manager = session_manager
+        super(MyObserver, self).__init__()
 
     def update(self, observable, actions):
         (added_cards, removed_cards) = actions
