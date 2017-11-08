@@ -59,17 +59,13 @@ class VehicleCanReceiver(Process):
         return (int.from_bytes(data, byteorder='big') & mask) >> 56
 
 class CanManager(object):
-    def __init__(self):
-        #TODO : adapt to the SessionManager code
-        self.odometer_value = Value(c_uint)
-        self.vin = Value(c_uint)
+    def __init__(self, session_manager, odometer_value, vin):
         self.vehicle_state = Value(c_uint)
         self.mode = Value(c_uint)
 
         mabx_process = MABXCanReceiver(self.mode)
         mabx_process.start()
-
-        vehicle_process = VehicleCanReceiver(self.odometer_value, self.vin, self.vehicle_state)
+        vehicle_process = VehicleCanReceiver(odometer_value, vin, self.vehicle_state)
         vehicle_process.start()
 
     def get_vehicle_state(self):
