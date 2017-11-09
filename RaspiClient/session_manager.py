@@ -37,7 +37,7 @@ class SessionManager():
 
     def change_user(self, new_user):
         with self.session_lock:
-            if self.current_session != MODE.MANUAL_DRIVING:
+            if self.current_session.mode != MODE.MANUAL_DRIVING:
                 raise AutoReportException('Cannot logout while autonomous driving is on')
             self.end_current_session()
             if new_user == self.current_session.user:
