@@ -18,6 +18,7 @@ class MODE(Enum):
     MANUAL_DRIVING = 'MAN'
     COOPERATIVE_DRIVING = 'COP'
     AUTONOMOUS_DRIVING = 'AUT'
+    UNKNOWN = 'UKN'
 
 
 class STATUS_CODE(Enum):

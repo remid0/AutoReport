@@ -20,18 +20,28 @@ class MABXCanReceiver(Process):
 
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
+                new_mode_trigram = self.get_mode_trigram(new_mode)
 
-                if self.mode == None and self.odometer.value != 0:
-                    self.session_manager.start_session(new_mode)
-                    self.mode = new_mode
+                if new_mode_trigram != settings.MODE.UNKNOWN:
 
-                elif self.mode != None and self.mode != new_mode:
-                    self.session_manager.change_mode(new_mode)
-                    self.mode = new_mode
+                    if self.mode == None and self.odometer.value != 0:
+                        self.session_manager.start_session(new_mode_trigram)
+                        self.mode = new_mode
+
+                    elif self.mode != None and self.mode != new_mode:
+                        self.session_manager.change_mode(new_mode_trigram)
+                        self.mode = new_mode
 
     def decode_mode_value(self, data):
         mask = 0xF000000
         return (int.from_bytes(data, byteorder='big') & mask) >> 24
+
+    def get_mode_trigram(self, mode):
+        return {
+            2 : (settings.MODE.MANUAL_DRIVING),
+            5 : settings.MODE.AUTONOMOUS_DRIVING,
+            8 : settings.MODE.COOPERATIVE_DRIVING
+        }.get(mode, settings.MODE.UNKNOWN)
 
 
 class VehicleCanReceiver(Process):
