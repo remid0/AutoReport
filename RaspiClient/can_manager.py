@@ -61,7 +61,9 @@ class VehicleCanReceiver(Process):
         return (int.from_bytes(data, byteorder='big') & mask) >> 12
 
     def decode_vin_value(self, data):
-        pass
+        # vin_white_zoe = 411332767
+        # vin_grey_zoe = 142897311
+        return int.from_bytes(data, byteorder='big')
 
     def decode_vehicle_state_value(self, data):
         mask = 0x700000000000000
