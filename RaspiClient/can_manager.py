@@ -7,11 +7,11 @@ import settings
 
 class MABXCanReceiver(Process):
 
-    def __init__(self, session_manager, odometer_value):
+    def __init__(self, session_manager, odometer):
         super(MABXCanReceiver, self).__init__()
-        self.mode = None
         self.session_manager = session_manager
-        self.odometer_value = odometer_value
+        self.odometer = odometer
+        self.mode = None
         self.mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
@@ -21,7 +21,7 @@ class MABXCanReceiver(Process):
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
 
-                if self.mode == None and self.odometer_value.value != 0:
+                if self.mode == None and self.odometer.value != 0:
                     self.session_manager.start_session(new_mode)
                     self.mode = new_mode
 
@@ -36,10 +36,12 @@ class MABXCanReceiver(Process):
 
 class VehicleCanReceiver(Process):
 
-    def __init__(self, session_manager, odometer_value, vin):
+    def __init__(self, session_manager, odometer, vin):
         super(VehicleCanReceiver, self).__init__()
-        self.odometer_value = odometer_value
+        self.odometer = odometer
+        self.session_manager = session_manager
         self.vin = vin
+        self.last_gps_odom = None
         self.vehicle_state = None
         self.vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
@@ -48,7 +50,12 @@ class VehicleCanReceiver(Process):
             message = self.vehicle_bus.recv()
 
             if message.arbitration_id == 0x5D7:
-                self.odometer_value.value = self.decode_odometer_value(message.data)
+                new_odometer_value = self.decode_odometer_value(message.data)
+                self.odometer.value = new_odometer_value
+
+                if self.last_gps_odom == None or (new_odometer_value - self.last_gps_odom) >= settings.GPS_DISTANCE_INTERVAL:
+                    self.session_manager.add_gps_point()
+                    self.last_gps_odom = new_odometer_value
 
             elif message.arbitration_id == 0x69F:
                 self.vin.value = self.decode_vin_value(message.data)
@@ -71,8 +78,8 @@ class VehicleCanReceiver(Process):
 
 class CanManager(object):
 
-    def __init__(self, session_manager, odometer_value, vin):
-        mabx_process = MABXCanReceiver(session_manager, odometer_value)
+    def __init__(self, session_manager, odometer, vin):
+        mabx_process = MABXCanReceiver(session_manager, odometer)
         mabx_process.start()
-        vehicle_process = VehicleCanReceiver(session_manager, odometer_value, vin)
+        vehicle_process = VehicleCanReceiver(session_manager, odometer, vin)
         vehicle_process.start()

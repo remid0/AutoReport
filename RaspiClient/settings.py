@@ -4,8 +4,11 @@ from enum import Enum
 CAN_BUS_TYPE = 'socketcan_native'
 CAN_VEHICLE_CHANNEL = 'vcan0'
 CAN_MABX_CHANNEL = 'vcan1'
-DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
+
+GPS_DISTANCE_INTERVAL = 1 # In decameters
 GPS_DEVICE = '/dev/ttyUSB0'
+
+DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
 SEVER_ADDRESS = 'http://127.0.0.1:8000/'
 SESSION_SAVE_FILE = 'sessions.sav'
