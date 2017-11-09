@@ -26,10 +26,6 @@ class SessionManager():
             self.current_session.stop(self.odometer_value.value)
             self.current_session.save(SESSION_SAVE_FILE)
 
-    def add_gps_point(self, gps_point):
-        with self.session_lock:
-            self.current_session.gps_points.append(gps_point)
-
     def change_mode(self, new_mode):
         with self.session_lock:
             self.end_current_session()
@@ -46,7 +42,7 @@ class SessionManager():
             self.start_session(self.current_session.mode, user=new_user)
             return STATUS_CODE.LOGIN
 
-    def add_gpt_point(self):
+    def add_gps_point(self):
         with self.session_lock:
             try:
                 gps_point = self.gps_manager.get_gps_point()
