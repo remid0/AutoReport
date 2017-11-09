@@ -125,9 +125,19 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+# Nominatim
+NOMINATIM_URL = ('http://nominatim.openstreetmap.org/reverse?lat=%f&lon=%f'
+                 '&zoom=16&format=json&extratags=1')
+NOMINATIM_SLEEP = 2  # sleep in second between two api requests
+
+# CELERY STUFF
+BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+CELERY_BROKER_TRANSPORT = 'redis'
+CELERY_ACCEPT_CONTENT = ['application/json']
+
 # Load local settings
 try:
-    # pylint: disable=line-too-long,unused-wildcard-import,wildcard-import,wrong-import-position
     from server.local_settings import *
 except ImportError:
     pass
