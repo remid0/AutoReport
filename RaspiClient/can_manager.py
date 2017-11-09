@@ -1,6 +1,4 @@
-from ctypes import c_uint
 from multiprocessing import Process
-from multiprocessing.sharedctypes import Value
 
 from can.interface import Bus
 
@@ -9,16 +7,27 @@ import settings
 
 class MABXCanReceiver(Process):
 
-    def __init__(self, mode):
+    def __init__(self, session_manager, odometer_value):
         super(MABXCanReceiver, self).__init__()
-        self.mode = mode
+        self.mode = None
+        self.session_manager = session_manager
+        self.odometer_value = odometer_value
         self.mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
         while True:
             message = self.mabx_bus.recv()
+
             if message.arbitration_id == 0xC1:
-                self.mode.value = self.decode_mode_value(message.data)
+                new_mode = self.decode_mode_value(message.data)
+
+                if self.mode == None and self.odometer_value.value != 0:
+                    self.session_manager.start_session(new_mode)
+                    self.mode = new_mode
+
+                elif self.mode != None and self.mode != new_mode:
+                    self.session_manager.change_mode(new_mode)
+                    self.mode = new_mode
 
     def decode_mode_value(self, data):
         mask = 0xF000000
@@ -27,11 +36,11 @@ class MABXCanReceiver(Process):
 
 class VehicleCanReceiver(Process):
 
-    def __init__(self, odometer_value, vin, vehicle_state):
+    def __init__(self, session_manager, odometer_value, vin):
         super(VehicleCanReceiver, self).__init__()
         self.odometer_value = odometer_value
         self.vin = vin
-        self.vehicle_state = vehicle_state
+        self.vehicle_state = None
         self.vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
@@ -45,7 +54,7 @@ class VehicleCanReceiver(Process):
                 self.vin.value = self.decode_vin_value(message.data)
 
             elif message.arbitration_id == 0x35C:
-                self.vehicle_state.value = self.decode_vehicle_state_value(message.data)
+                self.vehicle_state = self.decode_vehicle_state_value(message.data)
 
     def decode_odometer_value(self, data):
         mask = 0xFFFFF000
@@ -59,20 +68,9 @@ class VehicleCanReceiver(Process):
         return (int.from_bytes(data, byteorder='big') & mask) >> 56
 
 class CanManager(object):
+
     def __init__(self, session_manager, odometer_value, vin):
-        self.vehicle_state = Value(c_uint)
-        self.mode = Value(c_uint)
-
-        mabx_process = MABXCanReceiver(self.mode)
+        mabx_process = MABXCanReceiver(session_manager, odometer_value)
         mabx_process.start()
-        vehicle_process = VehicleCanReceiver(odometer_value, vin, self.vehicle_state)
+        vehicle_process = VehicleCanReceiver(session_manager, odometer_value, vin)
         vehicle_process.start()
-
-    def get_vehicle_state(self):
-        pass
-        # Possible states :
-            # 0 : vehicle asleep & engine stopped
-            # 1 : vehicle awake & engine stopped
-            # 2 : ignition ON
-            # 3 : starting in progress
-            # 4 : vehicle awake & engine running
