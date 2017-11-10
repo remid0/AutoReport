@@ -8,5 +8,5 @@ local_settings.py
 #Temporary
 *.sqlite3
 
-#PyCharm IDE
-.idea
+#Pycharm
+.idea/
