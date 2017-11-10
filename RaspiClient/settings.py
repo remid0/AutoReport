@@ -5,7 +5,6 @@ CAN_BUS_TYPE = 'socketcan_native'
 CAN_VEHICLE_CHANNEL = 'vcan0'
 CAN_MABX_CHANNEL = 'vcan1'
 
-GPS_DISTANCE_INTERVAL = 1 # In decameters
 GPS_DEVICE = '/dev/ttyUSB0'
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'

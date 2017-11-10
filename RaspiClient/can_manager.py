@@ -63,7 +63,7 @@ class VehicleCanReceiver(Process):
                 new_odometer_value = self.decode_odometer_value(message.data)
                 self.odometer.value = new_odometer_value
 
-                if self.last_gps_odom == None or (new_odometer_value - self.last_gps_odom) >= settings.GPS_DISTANCE_INTERVAL:
+                if self.last_gps_odom == None or (new_odometer_value - self.last_gps_odom) >= 1:
                     self.session_manager.add_gps_point()
                     self.last_gps_odom = new_odometer_value
 
