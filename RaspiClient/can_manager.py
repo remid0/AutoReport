@@ -20,21 +20,21 @@ class MABXCanReceiver(Process):
 
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
-                new_mode_trigram = self.get_mode_trigram(new_mode)
 
-                if new_mode_trigram != settings.MODE.UNKNOWN:
-
-                    if self.mode == None and self.odometer.value != 0:
-                        self.session_manager.start_session(new_mode_trigram)
+                if self.mode != new_mode and new_mode != settings.MODE.UNKNOWN:
+                    if self.mode == None:
+                        if self.odometer.value == 0:
+                            continue
+                        self.session_manager.start_session(new_mode)
                         self.mode = new_mode
-
-                    elif self.mode != None and self.mode != new_mode:
-                        self.session_manager.change_mode(new_mode_trigram)
+                    else:
+                        self.session_manager.change_mode(new_mode)
                         self.mode = new_mode
 
     def decode_mode_value(self, data):
         mask = 0xF000000
-        return (int.from_bytes(data, byteorder='big') & mask) >> 24
+        value = (int.from_bytes(data, byteorder='big') & mask) >> 24
+        return self.get_mode_trigram(value)
 
     def get_mode_trigram(self, mode):
         return {
