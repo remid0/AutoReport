@@ -29,8 +29,6 @@ class CreateSessionsView(CreateAPIView):
     serializer_class = SessionSerializer
 
     def create(self, request, *args, **kwargs):
-        import ipdb
-        ipdb.set_trace()
         serializer = self.get_serializer(data=request.data, many=True)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)

@@ -27,7 +27,7 @@ class User(AutoReportModel):
 
     utc_uid = models.CharField(unique=True, max_length=8, validators=[MinLengthValidator(8)])
     card_hash = models.CharField(max_length=64)
-    is_autorized_to_change_mode = models.BooleanField()
+    is_authorised_to_change_mode = models.BooleanField()
 
     is_ldap_completed = models.BooleanField(default=False, blank=True)
     first_name = models.CharField(max_length=25, blank=True)
@@ -68,7 +68,7 @@ class User(AutoReportModel):
 class Car(AutoReportModel):
 
     name = models.CharField(unique=True, max_length=20)
-    vin_code = models.CharField(max_length=17, validators=[MinLengthValidator(8)])
+    vin_code = models.BigIntegerField(unique=True)
 
     def __repr__(self):
         return self.name
@@ -77,7 +77,7 @@ class Car(AutoReportModel):
         return repr(self)
 
 
-class GpsPoint(AutoReportModel):
+class GpsPoint(models.Model):
 
     datetime = models.DateTimeField()
     latitude = models.DecimalField(max_digits=9, decimal_places=6)
@@ -100,14 +100,18 @@ class GpsPoint(AutoReportModel):
 
 class Road(AutoReportModel):
 
-    name = models.CharField(max_length=100)
-    kind = models.CharField(max_length=20)
+    name = models.CharField(max_length=100, default='N/A')
+    city = models.CharField(max_length=20, default='N/A')
+    kind = models.CharField(max_length=100, blank=True)
 
     def __repr__(self):
         return 'Road: %s' % self.name
 
     def __str__(self):
         return repr(self)
+
+    class Meta:
+        unique_together = ("name", "city")
 
 
 class Session(AutoReportModel):
@@ -130,7 +134,12 @@ class Session(AutoReportModel):
     users = models.ManyToManyField(User, related_name='sessions')
 
     def __repr__(self):
-        return 'Session: %s' % self.start_date.strftime('%Y-%m-%d %H:%M:%S')
+        return '%s: %s' % (
+            self.car.name,
+            self.start_date.astimezone(
+                timezone.get_current_timezone()
+            ).strftime('%Y-%m-%d %H:%M:%S')
+        )
 
     def __str__(self):
         return repr(self)
