@@ -1,0 +1,17 @@
+from enum import Enum
+
+# CAN_BUS_TYPE = 'kvaser'
+# CAN_VEHICLE_CHANNEL = 1
+# CAN_MABX_CHANNEL = 2
+# CAN_FILTERS = None
+# CAN_IS_MABX_AVAILABLE = False
+
+CAN_BUS_TYPE = 'socketcan_native'
+CAN_VEHICLE_CHANNEL = 'vcan0'
+CAN_MABX_CHANNEL = 'vcan1'
+CAN_IS_MABX_AVAILABLE = True
+
+class MODE(Enum):
+    MANUAL_DRIVING = 'MAN'
+    COOPERATIVE_DRIVING = 'COP'
+    AUTONOMOUS_DRIVING = 'AUT'
