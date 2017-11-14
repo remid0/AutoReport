@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from auto_report.models import GpsPoint, Session, User
+from auto_report.models import Car, GpsPoint, Session, User
 from auto_report.tasks import create_roads
 
 
@@ -22,6 +22,7 @@ class GpsPointSerializer(serializers.ModelSerializer):
 class SessionSerializer(serializers.ModelSerializer):
 
     gps_points = GpsPointSerializer(many=True)
+    car = serializers.SlugRelatedField(slug_field='vin_code', queryset=Car.objects.all())
 
     class Meta:
         model = Session

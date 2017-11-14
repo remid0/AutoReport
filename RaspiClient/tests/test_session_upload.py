@@ -12,14 +12,12 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
     # 49.04851, 2.09222 : Rue des Marechaux
 
 payload = [{
-    'car': {'vin_code': 12},
+    'car': 411332767,  # Car vin code: 411332767 | 142897311
     'start_date': datetime.utcnow().strftime(DATETIME_FORMAT),
     'stop_date': datetime.now().strftime(DATETIME_FORMAT),
-    'mode': 'AUT',
+    'mode': 'AUT',  # Mode as three letter code
     'distance': 20,
-    # it's an id from django store as server_pk in local database
-    'users': [3, 4],
-    'car': 1,
+    'users': [3, 4],  # List of User server ids
     'gps_points': [
         {
             'datetime': datetime.utcnow().strftime(DATETIME_FORMAT),

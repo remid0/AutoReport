@@ -68,7 +68,7 @@ class User(AutoReportModel):
 class Car(AutoReportModel):
 
     name = models.CharField(unique=True, max_length=20)
-    vin_code = models.BigIntegerField()
+    vin_code = models.BigIntegerField(unique=True)
 
     def __repr__(self):
         return self.name
