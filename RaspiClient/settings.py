@@ -11,6 +11,7 @@ DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
 SEVER_ADDRESS = 'http://127.0.0.1:8000/'
 SESSION_SAVE_FILE = 'sessions.sav'
+TIME_BETWEEN_UPLOAD = 300  # 5 min
 
 
 class MODE(Enum):

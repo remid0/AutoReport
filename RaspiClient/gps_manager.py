@@ -26,7 +26,10 @@ class GpsManager(object):
             time=self.agps_thread.data_stream.time,
             track=self.agps_thread.data_stream.track
         )
-        if new_gps_point.time == self.last_gps_point.time or new_gps_point.lat == 'n/a':
+        if (
+                        new_gps_point.datetime == self.last_gps_point.datetime or
+                        new_gps_point.latitude == 'n/a'
+        ):
             raise AutoReportException('No new value')
 
         self.last_gps_point = new_gps_point

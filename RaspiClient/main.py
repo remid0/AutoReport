@@ -3,12 +3,12 @@ from multiprocessing.managers import SyncManager
 
 from can_manager import CanManager
 from db_manager import DBManager
-from models import AutoReportException
 from nfc_manager import NFCManager
 from session_manager import SessionManager
+from upload_manager import UploadManager
 
 
-class Main():
+class Main(object):
 
     def __init__(self):
         pass
@@ -22,26 +22,13 @@ class Main():
 
         db_manager = manager.DBManager()
         odometer_value = manager.Value(c_int, 0)
-        vin = manager.Value(c_int, 0)
+        vin = manager.Queue(1)
         session_manager = manager.SessionManager(db_manager, odometer_value)
 
-        try:
-            pass
-            #db_manager.update_local_db()
-        except AutoReportException:  # Network Error
-            pass
+        CanManager(session_manager, odometer_value, vin)
+        NFCManager(session_manager, db_manager)
+        UploadManager(session_manager, db_manager)
 
-        can_manager = CanManager(session_manager, odometer_value, vin)
-        nfc_manager = NFCManager(session_manager, db_manager)
-
-        #import time
-        #time.sleep(10)
-
-        # join the can manager sub process and wait it to exit()
-
-        # gps_manger.terminate (to save the last gps point)
-
-        # upload session file and if succes delete it
 
 if __name__ == '__main__':
     Main().run()
