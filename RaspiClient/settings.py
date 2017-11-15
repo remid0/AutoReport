@@ -25,9 +25,10 @@ class STATUS_CODE(Enum):
     LOGOUT = 2
 
 
+GPIO_AUTHORISATION_OUTPUT = 12  # Free GPIO : 12 16 18 19 20 21 23
+
 # Load local settings
 try:
-    # pylint: disable=line-too-long,unused-wildcard-import,wildcard-import,wrong-import-position
     from local_settings import *
 except ImportError:
     pass
