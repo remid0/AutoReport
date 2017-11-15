@@ -89,7 +89,11 @@ class VehicleCanReceiver(Process):
 class CanManager(object):
 
     def __init__(self, session_manager, odometer, vin):
-        mabx_process = MABXCanReceiver(session_manager, odometer)
-        mabx_process.start()
-        vehicle_process = VehicleCanReceiver(session_manager, odometer, vin)
-        vehicle_process.start()
+        self.mabx_process = MABXCanReceiver(session_manager, odometer)
+        self.mabx_process.start()
+        self.vehicle_process = VehicleCanReceiver(session_manager, odometer, vin)
+        self.vehicle_process.start()
+
+    def __del__(self):
+        self.mabx_process.terminate()
+        self.vehicle_process.terminate()
