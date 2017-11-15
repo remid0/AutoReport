@@ -11,25 +11,25 @@ class MABXCanReceiver(Process):
         super(MABXCanReceiver, self).__init__()
         self.session_manager = session_manager
         self.odometer = odometer
-        self.mode = None
-        self.mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
+        mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
+        mode = None
         while True:
-            message = self.mabx_bus.recv()
+            message = mabx_bus.recv()
 
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
 
-                if self.mode != new_mode and new_mode != settings.MODE.UNKNOWN:
-                    if self.mode == None:
+                if mode != new_mode and new_mode != settings.MODE.UNKNOWN:
+                    if mode == None:
                         if self.odometer.value == 0:
                             continue
                         self.session_manager.start_session(new_mode)
-                        self.mode = new_mode
+                        mode = new_mode
                     else:
                         self.session_manager.change_mode(new_mode)
-                        self.mode = new_mode
+                        mode = new_mode
 
     def decode_mode_value(self, data):
         mask = 0xF000000
@@ -51,40 +51,32 @@ class VehicleCanReceiver(Process):
         self.odometer = odometer
         self.session_manager = session_manager
         self.vin = vin
-        self.last_gps_odom = None
-        self.vehicle_state = None
-        self.vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
+        vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
+        last_gps_odom = None
         while True:
-            message = self.vehicle_bus.recv()
+            message = vehicle_bus.recv()
 
             if message.arbitration_id == 0x5D7:
                 new_odometer_value = self.decode_odometer_value(message.data)
                 self.odometer.value = new_odometer_value
 
-                if self.last_gps_odom == None or (new_odometer_value - self.last_gps_odom) >= 1:
+                if last_gps_odom == None or (new_odometer_value - last_gps_odom) >= 1:
                     self.session_manager.add_gps_point()
-                    self.last_gps_odom = new_odometer_value
+                    last_gps_odom = new_odometer_value
 
             elif message.arbitration_id == 0x69F:
                 self.vin.value = self.decode_vin_value(message.data)
-
-            elif message.arbitration_id == 0x35C:
-                self.vehicle_state = self.decode_vehicle_state_value(message.data)
 
     def decode_odometer_value(self, data):
         mask = 0xFFFFF000
         return (int.from_bytes(data, byteorder='big') & mask) >> 12
 
     def decode_vin_value(self, data):
-        # vin_white_zoe = 411332767
-        # vin_grey_zoe = 142897311
+        # white_zoe_vin = 411332767, grey_zoe_vin = 142897311
         return int.from_bytes(data, byteorder='big')
 
-    def decode_vehicle_state_value(self, data):
-        mask = 0x700000000000000
-        return (int.from_bytes(data, byteorder='big') & mask) >> 56
 
 class CanManager(object):
 
