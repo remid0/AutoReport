@@ -3,12 +3,19 @@ import json
 from multiprocessing import Process
 import os
 import pickle
+import re
 import time
 
 import requests
 
 from models import GpsPoint, Session
-from settings import DATETIME_FORMAT, SESSION_SAVE_FILE, TIME_BETWEEN_UPLOAD
+from settings import (
+    DATETIME_FORMAT,
+    SEVER_IP,
+    SERVER_MAX_PING,
+    SESSION_SAVE_FILE,
+    TIME_BETWEEN_UPLOAD
+)
 
 
 class MyEncoder(json.JSONEncoder):
@@ -30,27 +37,37 @@ class Uploader(Process):
 
     def run(self):
         while True:
-            self.db_manager.update_local_db()
-            sessions = []
-            self.session_manager.acquire_file()
-            with open(SESSION_SAVE_FILE, 'rb') as sessions_save_file:
-                while True:
+            if self.is_network_connected():
+                self.db_manager.update_local_db()
+                sessions = []
+                self.session_manager.acquire_file()
+                with open(SESSION_SAVE_FILE, 'rb') as sessions_save_file:
+                    while True:
+                        try:
+                            sessions.append(pickle.load(sessions_save_file))
+                        except EOFError:
+                            break
+                if sessions:
                     try:
-                        sessions.append(pickle.load(sessions_save_file))
-                    except EOFError:
-                        break
-            if sessions:
-                try:
-                    result = requests.post(
-                        'http://localhost:8000/sessions/create/',
-                        json=json.dumps(sessions, cls=MyEncoder)
-                    )
-                except requests.exceptions.RequestException:
-                    continue
-                if result.status_code == 201:  # Upload success
-                    os.system('rm -f %s' % SESSION_SAVE_FILE)
-            self.session_manager.release_file()
+                        result = requests.post(
+                            'http://localhost:8000/sessions/create/',
+                            json=json.dumps(sessions, cls=MyEncoder)
+                        )
+                    except requests.exceptions.RequestException:
+                        continue
+                    if result.status_code == 201:  # Upload success
+                        os.system('rm -f %s' % SESSION_SAVE_FILE)
+                self.session_manager.release_file()
             time.sleep(TIME_BETWEEN_UPLOAD)
+
+    @classmethod
+    def is_network_connected(cls):
+        match = re.search(
+            r'time=(?P<travel_time>\d+\.\d+) ms(?:\n|.)+(?P<received_packet>\d+) received',
+            os.popen('ping -c 1 %s' % SEVER_IP).read()
+        )
+        return float(match.group('travel_time')) < SERVER_MAX_PING and  int(match.group('received_packet')) > 0
+
 
 
 class UploadManager(object):
