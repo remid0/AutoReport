@@ -9,23 +9,25 @@ class AutoReportException(Exception):
 class GpsPoint(object):
 
     def __init__(self, **kwargs):
-        self.alt = kwargs.get('alt', None)
-        self.lat = kwargs.get('lat', None)
-        self.lon = kwargs.get('lon', None)
+        self.altitude = kwargs.get('alt', None)
+        self.latitude = kwargs.get('lat', None)
+        self.longitude = kwargs.get('lon', None)
         self.speed = kwargs.get('speed', None)
-        self.time = kwargs.get('time', None)
+        self.datetime = kwargs.get('time', None)
         self.track = kwargs.get('track', None)
 
 
 class Session(object):
 
-    def __init__(self, mode, odometer_value, **kwargs):
-        self.end_datetime = None
-        self.distance = None
+    def __init__(self, mode, odometer_value, car, **kwargs):
+
         self.start_datetime = datetime.utcnow()
         self.mode = mode
         self.user = kwargs.get('user', None)
+        self.car = car
         self.gps_points = []
+        self.end_datetime = None
+        self.distance = None
 
         self._initial_odometer_value = odometer_value
 
@@ -35,19 +37,8 @@ class Session(object):
         del self._initial_odometer_value
 
     def save(self, filename):
-        with open(filename, 'ab+') as myfile:
-            pickle.dump(self, myfile)
-
-    @classmethod
-    def load(cls, filename):
-        sessions = []
-        with open(filename, 'rb') as myfile:
-            while True:
-                try:
-                    sessions.append(pickle.load(myfile))
-                except EOFError:
-                    break
-        return sessions
+        with open(filename, 'ab+') as session_save_file:
+            pickle.dump(self, session_save_file)
 
 
 class User(object):

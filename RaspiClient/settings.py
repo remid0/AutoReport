@@ -9,8 +9,13 @@ GPS_DEVICE = '/dev/ttyUSB0'
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
-SEVER_ADDRESS = 'http://127.0.0.1:8000/'
+
+SEVER_IP = '127.0.0.1'
+SEVER_PORT = 8000
+SEVER_ADDRESS = 'http://%s:%d/' % (SEVER_IP, SEVER_PORT)
+SERVER_MAX_PING = 0.500  # 500 ms
 SESSION_SAVE_FILE = 'sessions.sav'
+TIME_BETWEEN_UPLOAD = 300  # 5 min
 
 
 class MODE(Enum):
@@ -25,9 +30,10 @@ class STATUS_CODE(Enum):
     LOGOUT = 2
 
 
+GPIO_AUTHORISATION_OUTPUT = 12  # Free GPIO : 12 16 18 19 20 21 23
+
 # Load local settings
 try:
-    # pylint: disable=line-too-long,unused-wildcard-import,wildcard-import,wrong-import-position
     from local_settings import *
 except ImportError:
     pass

@@ -1,10 +1,13 @@
+import RPi.GPIO as GPIO
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import toHexString
 
-from db_manager import DBManager
 from models import AutoReportException
-from settings import STATUS_CODE
+from settings import STATUS_CODE, GPIO_AUTHORISATION_OUTPUT
 
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(GPIO_AUTHORISATION_OUTPUT, GPIO.OUT, initial=GPIO.LOW)
 
 GET_UID = [0xFF, 0xCA, 0x00, 0x00, 0x00]
 AUTHORIZED = [0xFF, 0x00, 0x40, 0xA2, 0x04, 0x01, 0x01, 0x02, 0x02]
@@ -40,13 +43,16 @@ class MyObserver(CardObserver):
             if result == STATUS_CODE.LOGIN:
                 if user.is_autorized_to_change_mode:
                     # Authorization = True
+                    GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.HIGH)
                     card.connection.transmit(AUTHORIZED)
                 else:
                     # Authorization = False
+                    GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
                     card.connection.transmit(UNAUTHORIZED)
 
             elif result == STATUS_CODE.LOGOUT:
                 # Authorization = False
+                GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
                 card.connection.transmit(LOGOUT)
 
         for card in removed_cards:
@@ -63,3 +69,4 @@ class NFCManager(object):
 
     def __del__(self):
         self.card_monitor.instance.deleteObservers()
+        GPIO.cleanup()
