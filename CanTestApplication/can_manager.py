@@ -5,8 +5,8 @@ from multiprocessing.sharedctypes import Value
 from can import Message
 from can.interface import Bus
 
-
 import settings
+
 
 class MABXCanSender(Process):
 
@@ -31,6 +31,7 @@ class VehicleCanSender(Process):
         super(VehicleCanSender, self).__init__()
         self.data = []
         self.odometer = odometer
+        #self.vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, can_filters=None, bustype=settings.CAN_BUS_TYPE)
         self.vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
 
     def run(self):
@@ -45,11 +46,11 @@ class VehicleCanSender(Process):
 
 class CanManager(object):
 
-    def __init__(self, mabxAvailable):
+    def __init__(self, mabx_ready):
         self.odometer = Value(c_uint, 0)
         self.mode = Value(c_int, 2)
 
-        if mabxAvailable:
+        if mabx_ready:
             self.mabx_process = MABXCanSender(self.mode)
             self.mabx_process.start()
 
