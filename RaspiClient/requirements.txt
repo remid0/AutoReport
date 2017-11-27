@@ -2,6 +2,7 @@ appnope==0.1.0
 certifi==2017.7.27.1
 chardet==3.0.4
 decorator==4.1.2
+gps3==0.33.3
 idna==2.6
 jedi==0.10.2
 ldap3==2.3
