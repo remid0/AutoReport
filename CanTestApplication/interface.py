@@ -29,7 +29,7 @@ class SessionTable(Frame):
             label.grid(row=row, column=0, sticky="wns", padx=1, pady=1)
             current_row.append(label)
 
-            label = Label(self, text="N/A", borderwidth=0, width=20)
+            label = Label(self, text="N/A", borderwidth=0, width=30)
             label.grid(row=row, column=1, sticky="wns", padx=1, pady=1)
             current_row.append(label)
 

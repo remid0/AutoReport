@@ -17,8 +17,8 @@ RPI_MABX_CHANNEL = 1
 RPI_FILTERS = None
 #TODO: change the two following paths
 RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/AutoReport/RaspiClient/sessions.sav'
-RPI_LOCAL_SESSIONS_FILE = '/home/AutoReport/sessions.sav'
-RPI_ID = 'pi@192.168.0.103'
+RPI_LOCAL_SESSIONS_FILE = '/home/robotex/AutoReport/sessions.sav'
+RPI_ID = 'pi@192.168.1.113'
 
 # Parameters specific to local tests
 LOCAL_APPLICATION_PATH= '../RaspiClient/main.py'
