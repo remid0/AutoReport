@@ -1,39 +1,46 @@
+from multiprocessing import Lock, Process
 import os
+import pickle
 
-from gps3.agps3threaded import AGPS3mechanism
+from gps3 import agps3
 
-from models import GpsPoint, AutoReportException
-import settings
+from models import GpsPoint
+from settings import GPS_DEVICE, LAST_GPS_POINT_FILE
+
+
+class GpsProcess(Process):
+    def __init__(self, lock):
+        super(GpsProcess, self).__init__()
+        self.file_lock = lock
+        self.gpsd_socket = agps3.GPSDSocket()
+        self.gpsd_socket.connect()
+        self.gpsd_socket.watch()
+        self.data_stream = agps3.DataStream()
+
+    def run(self):
+        for new_data in self.gpsd_socket:
+            if new_data:
+                self.data_stream.unpack(new_data)
+                new_gps_point = GpsPoint(**self.data_stream.alt)
+                if new_gps_point.latitude != 'n/a' and new_gps_point.longitude != 'n/a':
+                    with self.file_lock:
+                        with open(LAST_GPS_POINT_FILE, 'wb') as gps_save_file:
+                            pickle.dump(new_gps_point, gps_save_file)
+
+    def __del__(self):
+        self.gpsd_socket.close()
 
 
 class GpsManager(object):
 
-    def __init__(self, db_manager):
-        os.system('sudo gpsd %s' % settings.GPS_DEVICE)
-        self.agps_thread = AGPS3mechanism()
-        self.agps_thread.stream_data()
-        self.agps_thread.run_thread()
-
-        self.db_manager = db_manager
-        self.last_gps_point = self.db_manager.get_last_gps_point()
+    def __init__(self):
+        self.file_lock = Lock()
+        os.system('sudo gpsd %s' % GPS_DEVICE)
 
     def get_gps_point(self):
-        new_gps_point = GpsPoint(
-            alt=self.agps_thread.data_stream.alt,
-            lat=self.agps_thread.data_stream.lat,
-            lon=self.agps_thread.data_stream.lon,
-            speed=self.agps_thread.data_stream.speed,
-            time=self.agps_thread.data_stream.time,
-            track=self.agps_thread.data_stream.track
-        )
-        if (
-                        new_gps_point.datetime == self.last_gps_point.datetime or
-                        new_gps_point.latitude == 'n/a'
-        ):
-            raise AutoReportException('No new value')
+        with self.file_lock:
+            with open(LAST_GPS_POINT_FILE, 'rb') as gps_save_file:
+                return pickle.load(gps_save_file)
 
-        self.last_gps_point = new_gps_point
-        return new_gps_point
-
-    def stop(self):
-        self.db_manager.store_last_gps_point(self.last_gps_point)
+    def __del__(self):
+        self.subprocess.terminate()

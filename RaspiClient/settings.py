@@ -6,6 +6,7 @@ CAN_VEHICLE_CHANNEL = 'vcan0'
 CAN_MABX_CHANNEL = 'vcan1'
 
 GPS_DEVICE = '/dev/ttyUSB0'
+LAST_GPS_POINT_FILE = 'gps.sav'
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
