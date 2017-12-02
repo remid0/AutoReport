@@ -4,6 +4,7 @@ import logging
 from tkinter import *
 
 from settings import (
+    INITIAL_TEST_TYPE,
     LOCAL_APPLICATION_PATH,
     LOCAL_MABX_CHANNEL,
     LOCAL_VEHICLE_CHANNEL,
@@ -63,12 +64,10 @@ class WidgetLogger(logging.Handler):
 
 
 class Interface(Frame):
-    def __init__(self, window, main, can_manager, sessions_reader, mabx_ready, vehicle_ready):
+    def __init__(self, window, main, mabx_ready, vehicle_ready):
         Frame.__init__(self, window, width=2000, height=1800)
         self.grid()
 
-        self.can_manager = can_manager
-        self.sessions_reader = sessions_reader
         self.main = main
         self.mabx_ready = mabx_ready
         self.vehicle_ready = vehicle_ready
@@ -82,7 +81,7 @@ class Interface(Frame):
         local_rb.pack(anchor=W)
         rpi_rb = Radiobutton(test_type_group, text="Raspberry Pi", variable=self.test_type, value="rpi", command=self.change_test_type)
         rpi_rb.pack(anchor=W)
-        self.test_type.set("local")
+        self.test_type.set(INITIAL_TEST_TYPE)
 
         # Send message interface
         send_message_group = LabelFrame(self, text="Send a new message", font="bold")
@@ -126,7 +125,7 @@ class Interface(Frame):
 
         # Logger interface
         logger_group = LabelFrame(self, text="Logger", font="bold")
-        logger_group.grid(row=1, column=1)
+        logger_group.grid(rowspan=2, row=1, column=1)
 
         logger = Text(logger_group, state=DISABLED)
         logger_scrollbar = Scrollbar(logger_group, orient="vertical", command=logger.yview)
@@ -183,8 +182,10 @@ class Interface(Frame):
             if self.vehicle_ready:
                 self.candump_vehicle_button.grid(row=2, column=0)
         else:
-            self.candump_mabx_button.grid_remove()
-            self.candump_vehicle_button.grid_remove()
+            if self.mabx_ready:
+                self.candump_mabx_button.grid_remove()
+            if self.vehicle_ready:
+                self.candump_vehicle_button.grid_remove()
 
     def launch_local_application(self):
         os.system("gnome-terminal -e 'bash -c \"python %s; exec bash\"'" % LOCAL_APPLICATION_PATH)
@@ -194,16 +195,16 @@ class Interface(Frame):
         self.text_logger.emit("Not implemented yet.")
 
     def play_mabx_log(self):
-        self.can_manager.play_mabx_log()
+        self.main.can_manager.play_mabx_log()
         self.text_logger.emit("CAN logs of the mabx bus are currently being replayed.")
 
     def play_vehicle_log(self):
-        self.can_manager.play_vehicle_log()
+        self.main.can_manager.play_vehicle_log()
         self.text_logger.emit("CAN logs of the vehicle bus are currently being replayed.")
 
     def refresh_last_session(self):
         try:
-            new_session = self.sessions_reader.get_last_session()
+            new_session = self.main.sessions_reader.get_last_session()
             self.session_table.refresh(new_session)
             self.text_logger.emit("Last " + self.test_type.get() + " session refreshed !")
         except FileNotFoundError:
@@ -211,7 +212,7 @@ class Interface(Frame):
 
     def send_mode(self):
         new_mode = self.mode_listbox.get(ACTIVE)
-        self.can_manager.set_mode(new_mode)
+        self.main.can_manager.set_mode(new_mode)
         if self.test_type.get() == "local":
             channel = LOCAL_MABX_CHANNEL
         else:
@@ -221,7 +222,7 @@ class Interface(Frame):
     def send_odometer(self):
         new_odometer = int(self.odometer_spinbox.get())
         if new_odometer <= MAX_ODOMETER_VALUE:
-            self.can_manager.set_odometer(new_odometer)
+            self.main.can_manager.set_odometer(new_odometer)
             if self.test_type.get() == "local":
                 channel = LOCAL_VEHICLE_CHANNEL
             else:
@@ -231,9 +232,9 @@ class Interface(Frame):
             self.text_logger.emit("This odometer value is too high (max = %s)." % MAX_ODOMETER_VALUE)
 
     def stop_mabx_log(self):
-        self.can_manager.stop_playing_mabx_log()
+        self.main.can_manager.stop_playing_mabx_log()
         self.text_logger.emit("Stopped playing CAN logs from the mabx bus.")
 
     def stop_vehicle_log(self):
-        self.can_manager.stop_playing_vehicle_log()
+        self.main.can_manager.stop_playing_vehicle_log()
         self.text_logger.emit("Stopped playing CAN logs from the vehicle bus.")

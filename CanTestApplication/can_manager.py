@@ -80,7 +80,6 @@ class VehicleCanSender(Process):
             if test_type == "local":
                 self.vehicle_bus = Bus(channel=LOCAL_VEHICLE_CHANNEL, bustype=LOCAL_BUS_TYPE)
             else:
-
                 self.vehicle_bus = Bus(channel=RPI_VEHICLE_CHANNEL, can_filters=RPI_FILTERS, bustype=RPI_BUS_TYPE)
         except CanError:
             logging.warning("VehicleCanSender: couldn't create the vehicle bus !")

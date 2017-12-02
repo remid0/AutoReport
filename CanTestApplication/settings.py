@@ -1,6 +1,7 @@
 from enum import Enum
 
 # General parameters
+INITIAL_TEST_TYPE = "local"
 IS_MABX_READY = False
 IS_VEHICLE_READY = True
 MABX_LOGS_FILE = 'logs/can_mabx.txt'
@@ -17,7 +18,7 @@ RPI_FILTERS = None
 #TODO: change the two following paths
 RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/AutoReport/RaspiClient/sessions.sav'
 RPI_LOCAL_SESSIONS_FILE = '/home/AutoReport/sessions.sav'
-RPI_ID = 'pi@192.168.1.245'
+RPI_ID = 'pi@192.168.0.103'
 
 # Parameters specific to local tests
 LOCAL_APPLICATION_PATH= '../RaspiClient/main.py'

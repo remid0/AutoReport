@@ -3,7 +3,7 @@ from tkinter import *
 from can_manager import CanManager
 from interface import Interface
 from sessions_reader import SessionsReader
-from settings import IS_MABX_READY, IS_VEHICLE_READY
+from settings import INITIAL_TEST_TYPE, IS_MABX_READY, IS_VEHICLE_READY
 
 
 class Main():
@@ -12,12 +12,12 @@ class Main():
         pass
 
     def run(self):
-        self.can_manager = CanManager(IS_MABX_READY, IS_VEHICLE_READY, "local")
-        self.sessions_reader = SessionsReader("local")
+        self.can_manager = CanManager(IS_MABX_READY, IS_VEHICLE_READY, INITIAL_TEST_TYPE)
+        self.sessions_reader = SessionsReader(INITIAL_TEST_TYPE)
 
         window = Tk()
         window.title("TX : CanTestApplication")
-        interface = Interface(window, self, self.can_manager, self.sessions_reader, IS_MABX_READY, IS_VEHICLE_READY)
+        interface = Interface(window, self, IS_MABX_READY, IS_VEHICLE_READY)
         interface.mainloop()
         interface.destroy()
 
