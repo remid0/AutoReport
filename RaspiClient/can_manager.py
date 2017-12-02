@@ -67,7 +67,8 @@ class VehicleCanReceiver(Process):
                 logging.info("CanManager : odometer received = " + str(new_odometer_value))
                 self.odometer.value = new_odometer_value
 
-                if last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1:
+                if (self.session_manager.isCurrentSessionInitialized()) and \
+                        (last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1):
                     self.session_manager.add_gps_point()
                     last_gps_odom = new_odometer_value
 

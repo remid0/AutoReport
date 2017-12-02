@@ -77,3 +77,7 @@ class SessionManager(object):
 
     def release_file(self):
         self.file_lock.release()
+
+    def isCurrentSessionInitialized(self):
+        with self.session_lock:
+            return self.current_session is not None
