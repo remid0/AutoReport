@@ -1,4 +1,5 @@
 from ctypes import c_int
+import logging
 from multiprocessing.managers import SyncManager
 import signal
 
@@ -6,7 +7,10 @@ from can_manager import CanManager
 from db_manager import DBManager
 from nfc_manager import NFCManager
 from session_manager import SessionManager
+from settings import LOG_FILE, LOG_FORMAT
 from upload_manager import UploadManager
+
+logging.basicConfig(format=LOG_FORMAT, filename=LOG_FILE, level=logging.INFO)
 
 
 class Main(object):

@@ -1,3 +1,4 @@
+import logging
 from multiprocessing import Process
 import queue
 
@@ -22,6 +23,7 @@ class MABXCanReceiver(Process):
 
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
+                logging.info("CanManager : mode received = " + str(new_mode))
 
                 if mode != new_mode and new_mode != settings.MODE.UNKNOWN:
                     if mode is None:
@@ -62,6 +64,7 @@ class VehicleCanReceiver(Process):
 
             if message.arbitration_id == 0x5D7:
                 new_odometer_value = self.decode_odometer_value(message.data)
+                logging.info("CanManager : odometer received = " + str(new_odometer_value))
                 self.odometer.value = new_odometer_value
 
                 if last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1:
@@ -69,6 +72,7 @@ class VehicleCanReceiver(Process):
                     last_gps_odom = new_odometer_value
 
             elif message.arbitration_id == 0x69F:
+                logging.info("CanManager : vin received = " + str(self.decode_vin_value(message.data)))
                 try:
                     self.vin.put_nowait(self.decode_vin_value(message.data))
                 except queue.Full:

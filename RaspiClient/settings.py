@@ -5,6 +5,9 @@ CAN_BUS_TYPE = 'socketcan_native'
 CAN_VEHICLE_CHANNEL = 'can0'
 CAN_MABX_CHANNEL = 'can1'
 
+LOG_FILE = 'debug.log'
+LOG_FORMAT = '%(asctime)s => %(message)s'
+
 GPS_DEVICE = '/dev/ttyUSB0'
 LAST_GPS_POINT_FILE = 'gps.sav'
 

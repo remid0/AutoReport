@@ -1,3 +1,4 @@
+import logging
 from threading import Lock, RLock
 
 from gps_manager import GpsManager
@@ -26,6 +27,7 @@ class SessionManager(object):
                 car=car,
                 **kwargs
             )
+        logging.info("SessionManager : start session")
 
     def end_current_session(self):
         with self.session_lock:
@@ -41,6 +43,7 @@ class SessionManager(object):
                 car=self.current_session.car,
                 user=self.current_session.user
             )
+        logging.info("SessionManager : change mode = " + new_mode)
 
     # new_user must be given as an server user primary key 'server_pk' (integer)
     def change_user(self, new_user):
