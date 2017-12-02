@@ -16,6 +16,8 @@ SEVER_PORT = 8000
 SEVER_ADDRESS = 'http://%s:%d/' % (SEVER_IP, SEVER_PORT)
 SERVER_MAX_PING = 0.500  # 500 ms
 SESSION_SAVE_FILE = 'sessions.sav'
+SESSION_UPLOAD_FILE = 'to_upload_%d.sav'
+SESSION_UPLOAD_FILE_FILTER = r'^upload_([0-9]+)\.txt$'
 TIME_BETWEEN_UPLOAD = 300  # 5 min
 
 

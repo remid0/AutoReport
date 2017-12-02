@@ -23,7 +23,6 @@ class DBManager(object):
                     is_authorized_to_change_mode int
                 )''')
                 self.cursor.execute("CREATE TABLE LastUpdate (updated_at text)")
-                # self.cursor.execute("CREATE TABLE LastGpsPoint (updated_at text)")
                 self.connection.commit()
 
     def update_local_db(self):
@@ -86,9 +85,3 @@ class DBManager(object):
                     card_hash=result[1],
                     is_authorized_to_change_mode=result[2]
                 )
-
-    def store_last_gps_point(self, gps_point):
-        pass
-
-    def get_last_gps_point(self):
-        pass
