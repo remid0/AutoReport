@@ -2,8 +2,8 @@ from enum import Enum
 
 
 CAN_BUS_TYPE = 'socketcan_native'
-CAN_VEHICLE_CHANNEL = 'vcan0'
-CAN_MABX_CHANNEL = 'vcan1'
+CAN_VEHICLE_CHANNEL = 'can0'
+CAN_MABX_CHANNEL = 'can1'
 
 GPS_DEVICE = '/dev/ttyUSB0'
 LAST_GPS_POINT_FILE = 'gps.sav'
