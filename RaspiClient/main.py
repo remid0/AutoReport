@@ -1,5 +1,6 @@
 from ctypes import c_int
 from multiprocessing.managers import SyncManager
+import signal
 
 from can_manager import CanManager
 from db_manager import DBManager
@@ -28,6 +29,8 @@ class Main(object):
         CanManager(session_manager, odometer_value, vin)
         NFCManager(session_manager, db_manager)
         UploadManager(session_manager, db_manager)
+
+        signal.pause()
 
 
 if __name__ == '__main__':
