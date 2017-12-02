@@ -14,6 +14,8 @@ from settings import (
     SEVER_IP,
     SERVER_MAX_PING,
     SESSION_SAVE_FILE,
+    SESSION_UPLOAD_FILE,
+    SESSION_UPLOAD_FILE_FILTER,
     TIME_BETWEEN_UPLOAD
 )
 
@@ -38,27 +40,25 @@ class Uploader(Process):
     def run(self):
         while True:
             if self.is_network_connected():
-                self.db_manager.update_local_db()
                 sessions = []
-                self.session_manager.acquire_file()
-                with open(SESSION_SAVE_FILE, 'rb') as sessions_save_file:
-                    while True:
+                for file_name in self.move_file_and_get_list():
+                    with open(file_name, 'rb') as sessions_save_file:
+                        while True:
+                            try:
+                                sessions.append(pickle.load(sessions_save_file))
+                            except EOFError:
+                                break
+                    if sessions:
                         try:
-                            sessions.append(pickle.load(sessions_save_file))
-                        except EOFError:
-                            break
-                if sessions:
-                    try:
-                        result = requests.post(
-                            'http://localhost:8000/sessions/create/',
-                            json=json.dumps(sessions, cls=MyEncoder)
-                        )
-                    except requests.exceptions.RequestException:
-                        continue
-                    if result.status_code == 201:  # Upload success
-                        os.system('rm -f %s' % SESSION_SAVE_FILE)
-                self.session_manager.release_file()
-            time.sleep(TIME_BETWEEN_UPLOAD)
+                            result = requests.post(
+                                'http://localhost:8000/sessions/create/',
+                                json=json.dumps(sessions, cls=MyEncoder)
+                            )
+                        except requests.exceptions.RequestException:
+                            continue
+                        if result.status_code == requests.codes.created:
+                            os.system('rm -f %s' % file_name)
+                time.sleep(TIME_BETWEEN_UPLOAD)
 
     @classmethod
     def is_network_connected(cls):
@@ -68,6 +68,21 @@ class Uploader(Process):
         )
         return float(match.group('travel_time')) < SERVER_MAX_PING and  int(match.group('received_packet')) > 0
 
+    def move_file_and_get_list(self):
+        file_list = [
+            int(re.match(SESSION_UPLOAD_FILE_FILTER, file_name).group())
+            for file_name in os.listdir()
+            if re.match(SESSION_UPLOAD_FILE_FILTER, file_name)
+        ]
+        new_file_index = max([
+            int(re.match(SESSION_UPLOAD_FILE_FILTER, file_name).group(1))
+            for file_name in file_list
+        ]) + 1
+        self.session_manager.acquire_file()
+        os.rename(SESSION_SAVE_FILE, SESSION_UPLOAD_FILE % new_file_index)
+        self.session_manager.release_file()
+        file_list.append(SESSION_UPLOAD_FILE % new_file_index)
+        return file_list
 
 
 class UploadManager(object):
