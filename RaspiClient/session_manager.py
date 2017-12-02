@@ -7,10 +7,10 @@ from settings import MODE, SESSION_SAVE_FILE, STATUS_CODE
 
 class SessionManager(object):
 
-    def __init__(self, db_manager, odometer_value):
+    def __init__(self, odometer_value):
         self.odometer_value = odometer_value
         self.current_session = None
-        self.gps_manager = GpsManager(db_manager)
+        self.gps_manager = GpsManager()
         self.session_lock = RLock()
         self.file_lock = Lock()
 

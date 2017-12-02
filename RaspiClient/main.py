@@ -24,7 +24,7 @@ class Main(object):
         db_manager = manager.DBManager()
         odometer_value = manager.Value(c_int, 0)
         vin = manager.Queue(1)
-        session_manager = manager.SessionManager(db_manager, odometer_value)
+        session_manager = manager.SessionManager(odometer_value)
 
         CanManager(session_manager, odometer_value, vin)
         NFCManager(session_manager, db_manager)
