@@ -46,4 +46,4 @@ class User(object):
     def __init__(self, **kwargs):
         self.server_pk = kwargs.get('server_pk', None)
         self.card_hash = kwargs.get('card_hash', None)
-        self.is_authorized_to_change_mode = kwargs.get('is_authorized_to_change_mode', None)
+        self.is_authorised_to_change_mode = kwargs.get('is_authorised_to_change_mode', None)
