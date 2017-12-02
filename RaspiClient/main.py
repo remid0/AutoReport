@@ -10,8 +10,6 @@ from session_manager import SessionManager
 from settings import LOG_FILE, LOG_FORMAT
 from upload_manager import UploadManager
 
-logging.basicConfig(format=LOG_FORMAT, filename=LOG_FILE, level=logging.INFO)
-
 
 class Main(object):
 
@@ -19,6 +17,7 @@ class Main(object):
         pass
 
     def run(self):
+        logging.basicConfig(format=LOG_FORMAT, filename=LOG_FILE, level=logging.INFO)
 
         SyncManager.register('SessionManager', SessionManager)
         SyncManager.register('DBManager', DBManager)
@@ -30,7 +29,7 @@ class Main(object):
         vin = manager.Queue(1)
         session_manager = manager.SessionManager(odometer_value)
 
-        CanManager(session_manager, odometer_value, vin)
+        can_manager = CanManager(session_manager, odometer_value, vin)
         NFCManager(session_manager, db_manager)
         UploadManager(session_manager, db_manager)
 
