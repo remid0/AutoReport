@@ -42,10 +42,10 @@ class MABXCanReceiver(Process):
 
     def get_mode_trigram(self, mode):
         return {
-            2: settings.MODE.MANUAL_DRIVING,
-            5: settings.MODE.AUTONOMOUS_DRIVING,
-            8: settings.MODE.COOPERATIVE_DRIVING
-        }.get(mode, settings.MODE.UNKNOWN)
+            2: settings.MODE.MANUAL_DRIVING.value,
+            5: settings.MODE.AUTONOMOUS_DRIVING.value,
+            8: settings.MODE.COOPERATIVE_DRIVING.value
+        }.get(mode, settings.MODE.UNKNOWN.value)
 
 
 class VehicleCanReceiver(Process):
