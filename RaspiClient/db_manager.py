@@ -20,7 +20,7 @@ class DBManager(object):
                 self.cursor.execute('''CREATE TABLE Users (
                     server_pk int PRIMARY KEY,
                     card_hash text,
-                    is_authorized_to_change_mode int
+                    is_authorised_to_change_mode int
                 )''')
                 self.cursor.execute("CREATE TABLE LastUpdate (updated_at text)")
                 self.connection.commit()
@@ -46,11 +46,11 @@ class DBManager(object):
                     self.cursor.execute(
                         '''
                         UPDATE Users
-                        SET card_hash = '%s', is_authorized_to_change_mode = %d
+                        SET card_hash = '%s', is_authorised_to_change_mode = %d
                         WHERE server_pk = %d
                         ''' % (
                             user['card_hash'],
-                            1 if user['is_authorized_to_change_mode'] else 0,
+                            1 if user['is_authorised_to_change_mode'] else 0,
                             user['id']
                         )
                     )
@@ -58,7 +58,7 @@ class DBManager(object):
                     self.cursor.execute("INSERT INTO Users VALUES (%d, '%s', %d)" % (
                         user['id'],
                         user['card_hash'],
-                        1 if user['is_authorized_to_change_mode'] else 0
+                        1 if user['is_authorised_to_change_mode'] else 0
                     ))
             if last_update:
                 self.cursor.execute(
@@ -83,5 +83,5 @@ class DBManager(object):
                 return User(
                     server_pk=result[0],
                     card_hash=result[1],
-                    is_authorized_to_change_mode=result[2]
+                    is_authorised_to_change_mode=result[2]
                 )

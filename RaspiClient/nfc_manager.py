@@ -41,7 +41,7 @@ class MyObserver(CardObserver):
                 continue
 
             if result == STATUS_CODE.LOGIN:
-                if user.is_autorized_to_change_mode:
+                if user.is_authorised_to_change_mode:
                     # Authorization = True
                     GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.HIGH)
                     card.connection.transmit(AUTHORIZED)
