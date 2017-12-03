@@ -16,20 +16,20 @@ from settings import (
 
 
 class SessionTable(Frame):
-    def __init__(self, parent, rows=7, columns=2):
+    def __init__(self, parent, rows=8, columns=2):
         Frame.__init__(self, parent, background="grey")
 
         self.widgets = []
-        headers = ["start_datetime", "end_datetime", "distance", "mode", "user", "car", "gps_points"]
+        headers = ["start_datetime", "end_datetime", "distance", "mode", "user", "car", "number of gps_points", "first gps_point"]
 
         for row in range(rows):
             current_row = []
 
-            label = Label(self, text="%s" % (headers[row]), borderwidth=0, width=15)
+            label = Label(self, text="%s" % (headers[row]), borderwidth=0, width=20)
             label.grid(row=row, column=0, sticky="wns", padx=1, pady=1)
             current_row.append(label)
 
-            label = Label(self, text="N/A", borderwidth=0, width=20)
+            label = Label(self, text="N/A", borderwidth=0, width=35)
             label.grid(row=row, column=1, sticky="wns", padx=1, pady=1)
             current_row.append(label)
 
@@ -49,7 +49,15 @@ class SessionTable(Frame):
         self.set(3, 1, new_session.mode)
         self.set(4, 1, new_session.user)
         self.set(5, 1, new_session.car)
-        self.set(6, 1, new_session.gps_points)
+        self.set(6, 1, len(new_session.gps_points))
+        gps_point = new_session.gps_points[0]
+        self.set(7, 1,
+                 "datetime : " + str(gps_point.datetime) +
+                 "\nlatitude : " + str(gps_point.latitude) +
+                 "\nlongitude : " + str(gps_point.longitude) +
+                 "\nspeed : " + str(gps_point.speed) +
+                 "\ntrack : " + str(gps_point.track)
+        )
 
 
 class WidgetLogger(logging.Handler):
@@ -117,7 +125,7 @@ class Interface(Frame):
         session_group = LabelFrame(self, text="Last saved session", font="bold")
         session_group.grid(row=2, column=0)
 
-        self.session_table = SessionTable(session_group, 7, 2)
+        self.session_table = SessionTable(session_group, 8, 2)
         self.session_table.pack(side="left")
 
         refresh_button = Button(session_group, text="REFRESH", command=self.refresh_last_session)

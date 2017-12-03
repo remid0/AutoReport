@@ -43,7 +43,7 @@ class SessionManager(object):
                 car=self.current_session.car,
                 user=self.current_session.user
             )
-        logging.info("SessionManager : change mode = " + new_mode)
+        logging.info("SessionManager : change mode = " + str(new_mode))
 
     # new_user must be given as an server user primary key 'server_pk' (integer)
     def change_user(self, new_user):
