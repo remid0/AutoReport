@@ -69,6 +69,8 @@ class Uploader(Process):
         return float(match.group('travel_time')) < SERVER_MAX_PING and  int(match.group('received_packet')) > 0
 
     def move_file_and_get_list(self):
+        if not os.path.isfile(SESSION_SAVE_FILE):
+            return []
         file_list = [
             int(re.match(SESSION_UPLOAD_FILE_FILTER, file_name).group())
             for file_name in os.listdir()
@@ -77,7 +79,7 @@ class Uploader(Process):
         new_file_index = max([
             int(re.match(SESSION_UPLOAD_FILE_FILTER, file_name).group(1))
             for file_name in file_list
-        ]) + 1
+        ]) + 1 if file_list else 1
         self.session_manager.acquire_file()
         os.rename(SESSION_SAVE_FILE, SESSION_UPLOAD_FILE % new_file_index)
         self.session_manager.release_file()
