@@ -8,7 +8,6 @@ CAN_MABX_CHANNEL = 'can1'
 LOG_FILE = 'debug.log'
 LOG_FORMAT = '%(asctime)s => %(message)s'
 
-GPS_DEVICE = '/dev/ttyUSB0'
 LAST_GPS_POINT_FILE = 'gps.sav'
 
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'

@@ -30,8 +30,8 @@ class Main(object):
         session_manager = manager.SessionManager(odometer_value)
 
         can_manager = CanManager(session_manager, odometer_value, vin)
-        NFCManager(session_manager, db_manager)
-        UploadManager(session_manager, db_manager)
+        nfc_manager = NFCManager(session_manager, db_manager)
+        upload_manager = UploadManager(session_manager, db_manager)
 
         signal.pause()
 

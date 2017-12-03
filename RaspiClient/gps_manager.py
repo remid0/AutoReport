@@ -1,10 +1,9 @@
 from multiprocessing import Lock, Process
-import os
 import pickle
 
 from gps3 import agps3
 
-from models import GpsPoint
+from models import AutoReportException, GpsPoint
 from settings import GPS_DEVICE, LAST_GPS_POINT_FILE
 
 
@@ -35,12 +34,14 @@ class GpsManager(object):
 
     def __init__(self):
         self.file_lock = Lock()
-        os.system('sudo gpsd %s' % GPS_DEVICE)
 
     def get_gps_point(self):
         with self.file_lock:
-            with open(LAST_GPS_POINT_FILE, 'rb') as gps_save_file:
-                return pickle.load(gps_save_file)
+            try:
+                with open(LAST_GPS_POINT_FILE, 'rb') as gps_save_file:
+                    return pickle.load(gps_save_file)
+            except FileNotFoundError:
+                raise AutoReportException('No previous gps point')
 
     def __del__(self):
         self.subprocess.terminate()
