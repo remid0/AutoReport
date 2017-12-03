@@ -4,7 +4,7 @@ import pickle
 from gps3 import agps3
 
 from models import AutoReportException, GpsPoint
-from settings import GPS_DEVICE, LAST_GPS_POINT_FILE
+from settings import LAST_GPS_POINT_FILE
 
 
 class GpsProcess(Process):
