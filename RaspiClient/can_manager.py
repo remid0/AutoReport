@@ -5,6 +5,7 @@ import queue
 from can.interface import Bus
 
 import settings
+from models import AutoReportException
 
 
 class MABXCanReceiver(Process):
@@ -67,10 +68,12 @@ class VehicleCanReceiver(Process):
                 logging.info("CanManager : odometer received = " + str(new_odometer_value))
                 self.odometer.value = new_odometer_value
 
-                if (self.session_manager.isCurrentSessionInitialized()) and \
-                        (last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1):
-                    self.session_manager.add_gps_point()
-                    last_gps_odom = new_odometer_value
+                if last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1:
+                    try:
+                        self.session_manager.add_gps_point()
+                        last_gps_odom = new_odometer_value
+                    except AutoReportException:
+                        pass
 
             elif message.arbitration_id == 0x69F:
                 logging.info("CanManager : vin received = " + str(self.decode_vin_value(message.data)))
