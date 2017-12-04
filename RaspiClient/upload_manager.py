@@ -66,7 +66,11 @@ class Uploader(Process):
             r'time=(?P<travel_time>\d+\.\d+) ms(?:\n|.)+(?P<received_packet>\d+) received',
             os.popen('ping -c 1 %s' % SEVER_IP).read()
         )
-        return float(match.group('travel_time')) < SERVER_MAX_PING and  int(match.group('received_packet')) > 0
+        if match:
+            return (
+                float(match.group('travel_time')) < SERVER_MAX_PING and
+                int(match.group('received_packet')) > 0
+            )
 
     def move_file_and_get_list(self):
         if not os.path.isfile(SESSION_SAVE_FILE):
