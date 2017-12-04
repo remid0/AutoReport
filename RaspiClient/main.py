@@ -17,7 +17,7 @@ class Main(object):
         pass
 
     def run(self):
-        logging.basicConfig(format=LOG_FORMAT, filename=LOG_FILE, level=logging.INFO)
+        logging.basicConfig(format=LOG_FORMAT, filename=LOG_FILE, filemode='w', level=logging.INFO)
 
         SyncManager.register('SessionManager', SessionManager)
         SyncManager.register('DBManager', DBManager)

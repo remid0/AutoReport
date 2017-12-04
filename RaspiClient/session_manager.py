@@ -65,6 +65,8 @@ class SessionManager(object):
 
     def add_gps_point(self):
         with self.session_lock:
+            if self.current_session is None:
+                raise AutoReportException('Cannot add a gps point because the session has not been initialized.')
             try:
                 gps_point = self.gps_manager.get_gps_point()
             except AutoReportException:
