@@ -4,17 +4,17 @@ import queue
 
 from can.interface import Bus
 
-import settings
 from models import AutoReportException
+import settings
 
 
 class MABXCanReceiver(Process):
 
     def __init__(self, session_manager, odometer, vin):
+        super(MABXCanReceiver, self).__init__()
         self.session_manager = session_manager
         self.odometer = odometer
         self.vin = vin
-        super(MABXCanReceiver, self).__init__()
 
     def run(self):
         mabx_bus = Bus(channel=settings.CAN_MABX_CHANNEL, bustype=settings.CAN_BUS_TYPE)
@@ -24,7 +24,7 @@ class MABXCanReceiver(Process):
 
             if message.arbitration_id == 0xC1:
                 new_mode = self.decode_mode_value(message.data)
-                logging.info("CanManager : mode received = " + str(new_mode))
+                logging.info('CanManager : mode received = ' + str(new_mode))
 
                 if mode != new_mode and new_mode != settings.MODE.UNKNOWN:
                     if mode is None:
@@ -52,10 +52,10 @@ class MABXCanReceiver(Process):
 class VehicleCanReceiver(Process):
 
     def __init__(self, session_manager, odometer, vin):
+        super(VehicleCanReceiver, self).__init__()
         self.odometer = odometer
         self.session_manager = session_manager
         self.vin = vin
-        super(VehicleCanReceiver, self).__init__()
 
     def run(self):
         vehicle_bus = Bus(channel=settings.CAN_VEHICLE_CHANNEL, bustype=settings.CAN_BUS_TYPE)
@@ -65,18 +65,20 @@ class VehicleCanReceiver(Process):
 
             if message.arbitration_id == 0x5D7:
                 new_odometer_value = self.decode_odometer_value(message.data)
-                logging.info("CanManager : odometer received = " + str(new_odometer_value))
+                logging.info('CanManager : odometer received = ' + str(new_odometer_value))
                 self.odometer.value = new_odometer_value
 
                 if last_gps_odom is None or (new_odometer_value - last_gps_odom) >= 1:
                     try:
                         self.session_manager.add_gps_point()
-                        last_gps_odom = new_odometer_value
                     except AutoReportException:
                         pass
+                    else:
+                        last_gps_odom = new_odometer_value
+                        logging.info('CanManager : gps_point added.')
 
             elif message.arbitration_id == 0x69F:
-                logging.info("CanManager : vin received = " + str(self.decode_vin_value(message.data)))
+                logging.info('CanManager : vin received = ' + str(self.decode_vin_value(message.data)))
                 try:
                     self.vin.put_nowait(self.decode_vin_value(message.data))
                 except queue.Full:
