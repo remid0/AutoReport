@@ -2,8 +2,8 @@ from enum import Enum
 
 
 CAN_BUS_TYPE = 'socketcan_native'
-CAN_VEHICLE_CHANNEL = 'can0'
-CAN_MABX_CHANNEL = 'can1'
+CAN_VEHICLE_CHANNEL = 'can1'
+CAN_MABX_CHANNEL = 'can0'
 
 LOG_FILE = 'debug.log'
 LOG_FORMAT = '%(asctime)s => %(message)s'
@@ -13,10 +13,10 @@ LAST_GPS_POINT_FILE = 'gps.sav'
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
 
-SEVER_IP = '127.0.0.1'
+SEVER_IP = '192.168.1.191'
 SEVER_PORT = 8000
 SEVER_ADDRESS = 'http://%s:%d/' % (SEVER_IP, SEVER_PORT)
-SERVER_MAX_PING = 0.500  # 500 ms
+SERVER_MAX_PING = 500  # 500 ms
 SESSION_SAVE_FILE = 'sessions.sav'
 SESSION_UPLOAD_FILE = 'to_upload_%d.sav'
 SESSION_UPLOAD_FILE_FILTER = r'^upload_([0-9]+)\.txt$'

@@ -75,7 +75,7 @@ class VehicleCanReceiver(Process):
                         pass
                     else:
                         last_gps_odom = new_odometer_value
-                        logging.info('CanManager : gps_point added.')
+                        logging.info('CanManager : gps_point requested')
 
             elif message.arbitration_id == 0x69F:
                 logging.info('CanManager : vin received = ' + str(self.decode_vin_value(message.data)))

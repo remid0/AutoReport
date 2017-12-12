@@ -48,12 +48,15 @@ class SessionManager(object):
     # new_user must be given as an server user primary key 'server_pk' (integer)
     def change_user(self, new_user):
         with self.session_lock:
-            if self.current_session.user is None:
+            if self.current_session is None:
                 raise AutoReportException('Can Manager not Ready')
-            if self.current_session.mode != MODE.MANUAL_DRIVING:
+            if self.current_session.mode != MODE.MANUAL_DRIVING.value:
                 raise AutoReportException('Cannot logout while autonomous driving is on')
             self.end_current_session()
-            if new_user == self.current_session.user:
+
+            if self.current_session.user is None:
+                self.current_session.user = new_user
+            elif new_user == self.current_session.user:
                 self.start_session(mode=self.current_session.mode, car=self.current_session.car)
                 return STATUS_CODE.LOGOUT
             self.start_session(
@@ -66,7 +69,9 @@ class SessionManager(object):
     def add_gps_point(self):
         with self.session_lock:
             if self.current_session is None:
-                raise AutoReportException('Cannot add a gps point because the session has not been initialized.')
+                raise AutoReportException(
+                    'Cannot add a gps point because the session has not been initialized'
+                )
             try:
                 gps_point = self.gps_manager.get_gps_point()
             except AutoReportException:

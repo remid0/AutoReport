@@ -1,3 +1,5 @@
+import logging
+
 import RPi.GPIO as GPIO
 from smartcard.CardMonitoring import CardMonitor, CardObserver
 from smartcard.util import toHexString
@@ -38,22 +40,29 @@ class MyObserver(CardObserver):
                 result = self.session_manager.change_user(user.server_pk)
             except AutoReportException:
                 card.connection.transmit(ERROR)
+                logging.info('NfcManager : Session manager not ready')
                 continue
 
             if result == STATUS_CODE.LOGIN:
+                logging.info('NfcManager : User %d logs in ' % user.server_pk, user)
                 if user.is_authorised_to_change_mode:
                     # Authorization = True
                     GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.HIGH)
                     card.connection.transmit(AUTHORIZED)
+                    logging.info('NfcManager : Authorisation given')
+
                 else:
                     # Authorization = False
                     GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
                     card.connection.transmit(UNAUTHORIZED)
+                    logging.info('NfcManager : Authorisation removed')
 
             elif result == STATUS_CODE.LOGOUT:
+                logging.info('NfcManager : User %d logs out' % user.server_pk)
                 # Authorization = False
                 GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
                 card.connection.transmit(LOGOUT)
+                logging.info('NfcManager : Authorisation removed')
 
         for card in removed_cards:
             if card in self.cards:

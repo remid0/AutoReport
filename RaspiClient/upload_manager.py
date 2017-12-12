@@ -1,5 +1,6 @@
 from datetime import datetime
 import json
+import logging
 from multiprocessing import Process
 import os
 import pickle
@@ -40,6 +41,8 @@ class Uploader(Process):
     def run(self):
         while True:
             if self.is_network_connected():
+                self.db_manager.update_local_db()
+                logging.info('NetworkManager : DataBase updated')
                 sessions = []
                 for file_name in self.move_file_and_get_list():
                     with open(file_name, 'rb') as sessions_save_file:
@@ -57,6 +60,7 @@ class Uploader(Process):
                         except requests.exceptions.RequestException:
                             continue
                         if result.status_code == requests.codes.created:
+                            logging.info('NetworkManager : %s sent on server' % file_name)
                             os.system('rm -f %s' % file_name)
                 time.sleep(TIME_BETWEEN_UPLOAD)
 
