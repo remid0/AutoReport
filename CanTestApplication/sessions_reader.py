@@ -21,6 +21,10 @@ class SessionsReader(object):
         if self.test_type == "local":
             sessions = self.load_sessions_file(LOCAL_SESSIONS_FILE)
         else:
+            try:
+                os.remove(RPI_LOCAL_SESSIONS_FILE)
+            except FileNotFoundError:
+                pass
             os.system("scp -B %s:%s %s" % (RPI_ID, RPI_REMOTE_SESSIONS_FILE, RPI_LOCAL_SESSIONS_FILE))
             sessions = self.load_sessions_file(RPI_LOCAL_SESSIONS_FILE)
         return sessions[-1]
