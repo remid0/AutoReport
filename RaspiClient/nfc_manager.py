@@ -2,6 +2,7 @@ import logging
 
 import RPi.GPIO as GPIO
 from smartcard.CardMonitoring import CardMonitor, CardObserver
+from smartcard.Exceptions import CardConnectionException
 from smartcard.util import toHexString
 
 from models import AutoReportException
@@ -35,11 +36,18 @@ class MyObserver(CardObserver):
             response, sw1, sw2 = card.connection.transmit(GET_UID)
             card_uid = toHexString(response).replace(' ', '')
             user = self.db_manager.get_user(card_uid)
+            if not user:
+                card.connection.transmit(ERROR)
+                logging.info('NfcManager : No user associated to this card')
+                continue
 
             try:
                 result = self.session_manager.change_user(user.server_pk)
             except AutoReportException:
-                card.connection.transmit(ERROR)
+                try:
+                    card.connection.transmit(ERROR)
+                except CardConnectionException:
+                    pass
                 logging.info('NfcManager : Session manager not ready')
                 continue
 
@@ -48,20 +56,29 @@ class MyObserver(CardObserver):
                 if user.is_authorised_to_change_mode:
                     # Authorization = True
                     GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.HIGH)
-                    card.connection.transmit(AUTHORIZED)
+                    try:
+                        card.connection.transmit(AUTHORIZED)
+                    except CardConnectionException:
+                        pass
                     logging.info('NfcManager : Authorisation given')
 
                 else:
                     # Authorization = False
                     GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
-                    card.connection.transmit(UNAUTHORIZED)
+                    try:
+                        card.connection.transmit(UNAUTHORIZED)
+                    except CardConnectionException:
+                        pass
                     logging.info('NfcManager : Authorisation removed')
 
             elif result == STATUS_CODE.LOGOUT:
                 logging.info('NfcManager : User %d logs out' % user.server_pk)
                 # Authorization = False
                 GPIO.output(GPIO_AUTHORISATION_OUTPUT, GPIO.LOW)
-                card.connection.transmit(LOGOUT)
+                try:
+                    card.connection.transmit(LOGOUT)
+                except CardConnectionException:
+                    pass
                 logging.info('NfcManager : Authorisation removed')
 
         for card in removed_cards:
