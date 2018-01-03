@@ -17,7 +17,7 @@ payload = [{
     'stop_date': datetime.now().strftime(DATETIME_FORMAT),
     'mode': 'AUT',  # Mode as three letter code
     'distance': 20,
-    'users': [3, 4],  # List of User server ids
+    'users': [3,],  # List of User server ids
     'gps_points': [
         {
             'datetime': datetime.utcnow().strftime(DATETIME_FORMAT),

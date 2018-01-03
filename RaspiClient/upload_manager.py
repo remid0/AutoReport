@@ -12,7 +12,8 @@ import requests
 from models import GpsPoint, Session
 from settings import (
     DATETIME_FORMAT,
-    SEVER_IP,
+    SERVER_ADDRESS,
+    SERVER_IP,
     SERVER_MAX_PING,
     SESSION_SAVE_FILE,
     SESSION_UPLOAD_FILE,
@@ -54,7 +55,7 @@ class Uploader(Process):
                     if sessions:
                         try:
                             result = requests.post(
-                                'http://localhost:8000/sessions/create/',
+                                '%ssessions/create/' % SERVER_ADDRESS,
                                 json=json.dumps(sessions, cls=MyEncoder)
                             )
                         except requests.exceptions.RequestException:
@@ -68,7 +69,7 @@ class Uploader(Process):
     def is_network_connected(cls):
         match = re.search(
             r'time=(?P<travel_time>\d+\.\d+) ms(?:\n|.)+(?P<received_packet>\d+) received',
-            os.popen('ping -c 1 %s' % SEVER_IP).read()
+            os.popen('ping -c 1 %s' % SERVER_IP).read()
         )
         if match:
             return (

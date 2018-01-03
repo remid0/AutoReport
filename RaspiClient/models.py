@@ -23,7 +23,7 @@ class Session(object):
 
         self.start_datetime = datetime.utcnow()
         self.mode = mode
-        self.user = kwargs.get('user', None)
+        self.user = kwargs.get('user', [])
         self.car = car
         self.gps_points = []
         self.end_datetime = None

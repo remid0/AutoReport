@@ -10,8 +10,8 @@ SESSION_UPLOAD_FILE = '%s/to_upload_' % OUTPUT_DIRECTORY + '%d.sav'
 
 # Can Settings
 CAN_BUS_TYPE = 'socketcan_native'
-CAN_VEHICLE_CHANNEL = 'can1'
-CAN_MABX_CHANNEL = 'can0'
+CAN_VEHICLE_CHANNEL = 'can0'
+CAN_MABX_CHANNEL = 'can1'
 
 # Logging Settings
 LOG_FORMAT = '%(asctime)s => %(message)s'
@@ -19,8 +19,8 @@ LOG_FORMAT = '%(asctime)s => %(message)s'
 # Uploader Settings
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
-SEVER_IP = '192.168.1.191'
-SEVER_ADDRESS = 'http://%s:8000/' % SEVER_IP
+SERVER_IP = '192.168.43.26'
+SERVER_ADDRESS = 'http://%s:8000/' % SERVER_IP
 SERVER_MAX_PING = 500  # 500 ms
 SESSION_UPLOAD_FILE_FILTER = r'^upload_([0-9]+)\.txt$'
 TIME_BETWEEN_UPLOAD = 300  # 5 min

@@ -32,11 +32,11 @@ class DBManager(object):
             last_update = self.cursor.fetchone()
             if last_update:
                 results = requests.get(
-                    '%susers/' % settings.SEVER_ADDRESS,
+                    '%susers/' % settings.SERVER_ADDRESS,
                     params={'last_update': last_update[0]}
                 )
             else:
-                results = requests.get('%susers/' % settings.SEVER_ADDRESS)
+                results = requests.get('%susers/' % settings.SERVER_ADDRESS)
             if results.status_code != 200:
                 raise ValueError('Fail to connect to the server')
 
