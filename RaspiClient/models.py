@@ -37,6 +37,7 @@ class Session(object):
         del self._initial_odometer_value
 
     def save(self, filename):
+        self.users = self.users if isinstance(self.users, list) else list(self.users)
         with open(filename, 'ab+') as session_save_file:
             pickle.dump(self, session_save_file)
 

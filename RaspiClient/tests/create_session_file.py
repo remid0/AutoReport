@@ -5,7 +5,7 @@ from settings import DATETIME_FORMAT, SESSION_SAVE_FILE
 
 
 # Session A
-session_a = Session(mode='MAN', odometer_value=10, user=3, car=411332767)
+session_a = Session(mode='MAN', odometer_value=10, user=[3], car=411332767)
 session_a.start_date = datetime.strptime('2017-01-01T10:00:00.000Z', DATETIME_FORMAT)
 session_a.stop_date = datetime.strptime('2017-01-01T10:30:00.000Z', DATETIME_FORMAT)
 session_a.distance = 5
@@ -55,7 +55,7 @@ del session_a._initial_odometer_value
 #session_a.save(SESSION_SAVE_FILE)
 
 # Session B
-session_b = Session(mode='COP', odometer_value=15, user=3, car=411332767)
+session_b = Session(mode='COP', odometer_value=15, user=[3], car=411332767)
 session_b.start_date = datetime.strptime('2017-01-01T10:30:00.000Z', DATETIME_FORMAT)
 session_b.stop_date = datetime.strptime('2017-01-01T11:30:00.000Z', DATETIME_FORMAT)
 session_b.distance = 10
@@ -63,7 +63,7 @@ del session_b._initial_odometer_value
 #session_b.save(SESSION_SAVE_FILE)
 
 # Session C
-session_c = Session(mode='AUT', odometer_value=25, user=4, car=142897311)
+session_c = Session(mode='AUT', odometer_value=25, user=[4], car=142897311)
 session_c.start_date = datetime.strptime('2017-01-01T11:30:00.000Z', DATETIME_FORMAT)
 session_c.stop_date = datetime.strptime('2017-01-01T14:00:00.000Z', DATETIME_FORMAT)
 session_c.distance = 20
