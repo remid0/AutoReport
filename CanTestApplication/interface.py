@@ -43,11 +43,11 @@ class SessionTable(Frame):
         widget.configure(text=value)
 
     def refresh(self, new_session):
-        self.set(0, 1, new_session.start_datetime)
-        self.set(1, 1, new_session.end_datetime)
+        self.set(0, 1, new_session.start_date)
+        self.set(1, 1, new_session.stop_date)
         self.set(2, 1, new_session.distance)
         self.set(3, 1, new_session.mode)
-        self.set(4, 1, new_session.user)
+        self.set(4, 1, new_session.users)
         self.set(5, 1, new_session.car)
         self.set(6, 1, len(new_session.gps_points))
         gps_point = new_session.gps_points[0]
