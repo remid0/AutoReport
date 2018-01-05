@@ -19,7 +19,7 @@ LOG_FORMAT = '%(asctime)s => %(message)s'
 # Uploader Settings
 DATETIME_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
 LOCAL_DB_NAME = 'users_db.sqlite3'
-SERVER_IP = '192.168.43.26'
+SERVER_IP = '192.168.100.1'
 SERVER_ADDRESS = 'http://%s:8000/' % SERVER_IP
 SERVER_MAX_PING = 500  # 500 ms
 SESSION_UPLOAD_FILE_FILTER = r'^upload_([0-9]+)\.txt$'

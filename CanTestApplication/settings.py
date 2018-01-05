@@ -12,14 +12,14 @@ VEHICLE_LOGS_FILE = 'logs/can_vehicle.txt'
 #TODO: change the following
 RPI_APPLICATION_PATH = ''
 RPI_BUS_TYPE = 'kvaser'
-RPI_VEHICLE_CHANNEL = 1
-RPI_MABX_CHANNEL = 0
+RPI_VEHICLE_CHANNEL = 0
+RPI_MABX_CHANNEL = 1
 RPI_FILTERS = None
 #TODO: change the two following paths
 #RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/AutoReport/RaspiClient/output/sessions.sav'
 RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/delete_me/output/sessions.sav'
 RPI_LOCAL_SESSIONS_FILE = '/home/robotex/AutoReport/sessions.sav'
-RPI_ID = 'pi@192.168.1.113'
+RPI_ID = 'pi@192.168.147.128'
 
 # Parameters specific to local tests
 LOCAL_APPLICATION_PATH= '../RaspiClient/main.py'
