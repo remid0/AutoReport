@@ -16,8 +16,8 @@ RPI_VEHICLE_CHANNEL = 0
 RPI_MABX_CHANNEL = 1
 RPI_FILTERS = None
 #TODO: change the two following paths
-#RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/AutoReport/RaspiClient/output/sessions.sav'
-RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/delete_me/output/sessions.sav'
+RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/AutoReport/RaspiClient/output/sessions.sav'
+#RPI_REMOTE_SESSIONS_FILE = '/home/pi/workspace/delete_me/output/sessions.sav'
 RPI_LOCAL_SESSIONS_FILE = '/home/robotex/AutoReport/sessions.sav'
 RPI_ID = 'pi@192.168.147.128'
 
