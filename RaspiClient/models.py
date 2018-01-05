@@ -21,18 +21,18 @@ class Session(object):
 
     def __init__(self, mode, odometer_value, car, **kwargs):
 
-        self.start_datetime = datetime.utcnow()
+        self.start_date = datetime.utcnow()
         self.mode = mode
-        self.user = kwargs.get('user', [])
+        self.users = kwargs.get('user', [])
         self.car = car
         self.gps_points = []
-        self.end_datetime = None
+        self.stop_date = None
         self.distance = None
 
         self._initial_odometer_value = odometer_value
 
     def stop(self, odometer_value):
-        self.end_datetime = datetime.utcnow()
+        self.stop_date = datetime.utcnow()
         self.distance = odometer_value - self._initial_odometer_value
         del self._initial_odometer_value
 

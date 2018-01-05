@@ -56,7 +56,8 @@ class Uploader(Process):
                         try:
                             result = requests.post(
                                 '%ssessions/create/' % SERVER_ADDRESS,
-                                json=json.dumps(sessions, cls=MyEncoder)
+                                data=json.dumps(sessions, cls=MyEncoder),
+                                headers={'Content-Type': 'application/json'}
                             )
                         except requests.exceptions.RequestException:
                             continue
