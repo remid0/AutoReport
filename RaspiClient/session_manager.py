@@ -41,7 +41,7 @@ class SessionManager(object):
             self.start_session(
                 mode=new_mode,
                 car=self.current_session.car,
-                user=self.current_session.user
+                user=self.current_session.users
             )
         logging.info('SessionManager : change mode = ' + str(new_mode))
 
@@ -54,8 +54,8 @@ class SessionManager(object):
                 raise AutoReportException('Cannot logout while autonomous driving is on')
             self.end_current_session()
 
-            if self.current_session.user is None:
-                self.current_session.user = new_user
+            if self.current_session.users is None:
+                self.current_session.users = new_user
             elif new_user == self.current_session.user:
                 self.start_session(mode=self.current_session.mode, car=self.current_session.car)
                 return STATUS_CODE.LOGOUT
